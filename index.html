@@ -10,10 +10,8 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jsPDF (for Export Data) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- Fonts -->
+  <!-- Fonts & base styles -->
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
     html, body { height: 100%; }
@@ -23,7 +21,6 @@
     .btn-grad { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
     .btn-grad-2 { background: linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%) }
     .inventory-tab.active, .shop-tab.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
-    .achievement-glow { box-shadow: 0 0 20px rgba(102,126,234,0.5) }
     .notification-badge { animation: pulse 2s infinite }
     @keyframes pulse {0%,100%{opacity:1} 50%{opacity:.5}}
     /* Toasts */
@@ -36,8 +33,18 @@
     .mood-sad { background: linear-gradient(135deg, #3b82f6, #0ea5e9 60%) }
     .mood-angry { background: linear-gradient(135deg, #ef4444, #f97316 60%) }
     .mood-energized { background: linear-gradient(135deg, #8b5cf6, #06b6d4 60%) }
-    /* Square icon button fix */
     .icon-btn { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: .75rem }
+    /* Llama canvas layering */
+    .llama-canvas { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+    .llama-layer { position: absolute; inset: 0; object-fit: contain; transform-origin: center; pointer-events: none; }
+    /* Shop tabs */
+    .tab-btn { padding:.5rem .75rem; border-radius:.75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
+    .tab-btn.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
+    /* Modal shell */
+    .modal { position: fixed; inset: 0; z-index: 999; display: none; align-items: center; justify-content: center; padding:1rem; }
+    .modal.show { display: flex; }
+    /* Emoji mood buttons */
+    .mood-emoji { font-size: 28px; line-height: 1; }
   </style>
 </head>
 
@@ -99,7 +106,7 @@
     </div>
   </section>
 
-  <!-- Rep Join (collect first name once) -->
+  <!-- Rep Join -->
   <section id="repJoin" class="hidden min-h-screen flex items-center justify-center p-4">
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Join Your Team</h2>
@@ -115,7 +122,7 @@
     </div>
   </section>
 
-  <!-- Rep Login (email + team code) -->
+  <!-- Rep Login -->
   <section id="repLogin" class="hidden min-h-screen flex items-center justify-center p-4">
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Access Your Dashboard</h2>
@@ -154,13 +161,11 @@
             <p class="text-white/80" id="teamInfo">Team: Loading...</p>
           </div>
           <div class="flex items-center gap-3">
-            <!-- Square icon buttons with consistent sizing -->
             <button id="pendingBell" onclick="UI.show('managerApprovals')" class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
               <span>🔔</span>
               <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded notification-badge">0</span>
             </button>
-            <button onclick="Handlers.exportPDF()" class="icon-btn bg-indigo-500 hover:bg-indigo-600 transition" title="Export data as PDF">📄</button>
-            <button onclick="UI.show('landingPage')" class="icon-btn bg-white/10 hover:bg-white/20 transition" title="Sign out">⎋</button>
+            <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
       </div>
@@ -170,19 +175,17 @@
         <!-- Pending Approvals -->
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Pending approvals</h2>
-          <div id="approvalsList" class="space-y-3">
-            <!-- Filled dynamically -->
-          </div>
+          <div id="approvalsList" class="space-y-3"></div>
           <button onclick="Handlers.refreshApprovals()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">
             Refresh
           </button>
         </div>
 
-        <!-- Custom Activities (4) with smart parsing -->
+        <!-- Custom Activities (4) -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold mb-2">Daily focus activities (4)</h2>
-            <span class="text-white/60 text-sm">Tip: “Log 3 calls” will auto detect target</span>
+            <span class="text-white/60 text-sm">Tip: “Log 3 calls” auto-detects the 3</span>
           </div>
           <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
             <input id="act1" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 1">
@@ -197,11 +200,9 @@
         <div class="glass rounded-2xl p-6 lg:col-span-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold mb-2">Team mood this week</h2>
-            <span class="text-white/60 text-sm">Average of daily check ins</span>
+            <span class="text-white/60 text-sm">Average of daily emoji check-ins</span>
           </div>
-          <div id="moodChart" class="w-full overflow-x-auto">
-            <!-- Inline SVG bars -->
-          </div>
+          <div id="moodChart" class="w-full overflow-x-auto"></div>
         </div>
       </div>
 
@@ -212,15 +213,13 @@
           <div id="leaderboard" class="space-y-2"></div>
         </div>
         <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Team gifting</h2>
+          <h2 class="text-xl font-semibold mb-3">Team gifting (food)</h2>
           <form onsubmit="Handlers.managerGift(event)" class="grid md:grid-cols-3 gap-3">
             <select id="giftRecipient" class="bg-white/10 border border-white/20 rounded-xl p-3"></select>
-            <select id="giftItem" class="bg-white/10 border border-white/20 rounded-xl p-3">
-              <!-- Filled with food items -->
-            </select>
+            <select id="giftItem" class="bg-white/10 border border-white/20 rounded-xl p-3"></select>
             <button class="btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Send gift</button>
           </form>
-          <p class="mt-3 text-sm text-white/70">Managers can send food to any team member</p>
+          <p class="mt-3 text-sm text-white/70">Managers can send food items to any team member</p>
         </div>
       </div>
     </div>
@@ -229,7 +228,7 @@
   <!-- Rep Dashboard -->
   <section id="repDashboard" class="hidden min-h-screen p-4">
     <div class="max-w-6xl mx-auto space-y-6">
-      <!-- Header with mood background -->
+      <!-- Header -->
       <div id="repHeader" class="rounded-2xl p-6 glass">
         <div class="flex flex-wrap gap-4 items-center justify-between">
           <div class="flex items-center gap-4">
@@ -240,16 +239,31 @@
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <button onclick="UI.show('landingPage')" class="icon-btn bg-white/10 hover:bg-white/20 transition" title="Sign out">⎋</button>
+            <button onclick="UI.openMoodModal()" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600">Daily mood</button>
+            <button onclick="UI.openShop()" class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Open shop</button>
+            <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
       </div>
 
-      <!-- Llama care and quick actions -->
+      <!-- Llama care and preview -->
       <div class="grid lg:grid-cols-3 gap-6">
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Your llama</h2>
-          <div class="space-y-3">
+
+          <div class="llama-canvas">
+            <!-- Base character -->
+            <img id="llama-base" class="llama-layer" alt="llama" src="">
+            <!-- Layered items -->
+            <img id="layer-hat" class="llama-layer" alt="">
+            <img id="layer-neck" class="llama-layer" alt="">
+            <img id="layer-pants" class="llama-layer" alt="">
+            <img id="layer-shoes" class="llama-layer" alt="">
+            <!-- Multiple accessories -->
+            <div id="layer-accessories" class="llama-layer" style="position:absolute; inset:0;"></div>
+          </div>
+
+          <div class="space-y-3 mt-4">
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-semibold">Name: <span id="llamaNameLabel">Unnamed</span></div>
@@ -257,7 +271,6 @@
               </div>
               <button class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-sm" onclick="Handlers.promptRename()">Update Name</button>
             </div>
-
             <div>
               <div class="text-sm mb-1">Hunger</div>
               <div class="w-full bg-white/10 h-3 rounded">
@@ -271,20 +284,11 @@
               </div>
             </div>
 
-            <div class="flex gap-2">
-              <button onclick="Handlers.playPetting()" class="flex-1 btn-grad px-3 py-2 rounded-xl font-semibold hover:brightness-110 transition">
-                Pet mini game
-              </button>
-              <button onclick="UI.show('foodShopModal')" class="flex-1 bg-indigo-500 hover:bg-indigo-600 px-3 py-2 rounded-xl font-semibold transition">
-                Food shop
-              </button>
-            </div>
-
-            <div>
-              <div class="text-sm text-white/70">Inventory</div>
-              <div id="inventoryList" class="mt-2 grid grid-cols-2 gap-2">
-                <!-- Food items -->
-              </div>
+            <!-- Food quick actions -->
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Feed Hay</button>
+              <button onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
+              <button onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
             </div>
           </div>
         </div>
@@ -298,24 +302,6 @@
           <div id="activitiesList" class="mt-3 space-y-3"></div>
         </div>
 
-        <!-- Daily Check In -->
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Daily check in</h2>
-          <form onsubmit="Handlers.submitCheckin(event)" class="space-y-3">
-            <label class="block text-sm">Mood (1 to 5)
-              <input id="checkMood" type="number" min="1" max="5" value="3" class="mt-1 w-full p-2 rounded bg-white/10 border border-white/20">
-            </label>
-            <label class="block text-sm">Energy (1 to 5)
-              <input id="checkEnergy" type="number" min="1" max="5" value="3" class="mt-1 w-full p-2 rounded bg-white/10 border border-white/20">
-            </label>
-            <label class="block text-sm">Break time today (minutes)
-              <input id="checkBreak" type="number" min="0" max="120" value="10" class="mt-1 w-full p-2 rounded bg-white/10 border border-white/20">
-            </label>
-            <button class="btn-grad rounded-xl py-2 w-full font-semibold hover:brightness-110 transition">Submit</button>
-          </form>
-          <p class="text-xs text-white/70 mt-2">Your llama will rest during your break and remind you to rest too</p>
-        </div>
-
         <!-- Team Social -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
           <div class="flex items-center justify-between">
@@ -325,7 +311,7 @@
 
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <h3 class="font-semibold mb-2">Send a gift</h3>
+              <h3 class="font-semibold mb-2">Send a food gift</h3>
               <form onsubmit="Handlers.repGift(event)" class="grid grid-cols-3 gap-2">
                 <select id="repGiftRecipient" class="bg-white/10 border border-white/20 rounded-xl p-2 col-span-2"></select>
                 <select id="repGiftItem" class="bg-white/10 border border-white/20 rounded-xl p-2"></select>
@@ -334,9 +320,7 @@
             </div>
             <div>
               <h3 class="font-semibold mb-2">Inbox</h3>
-              <div id="giftInbox" class="space-y-2">
-                <!-- Gifts appear here -->
-              </div>
+              <div id="giftInbox" class="space-y-2"></div>
             </div>
           </div>
         </div>
@@ -350,69 +334,116 @@
     </div>
   </section>
 
-  <!-- Modal: Food Shop -->
-  <div id="foodShopModal" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/60" onclick="UI.hide('foodShopModal')"></div>
-    <div class="relative glass rounded-2xl p-6 max-w-md w-full">
-      <h2 class="text-xl font-semibold mb-3">Food shop</h2>
-      <div id="shopItems" class="space-y-2"></div>
-      <button onclick="UI.hide('foodShopModal')" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
+  <!-- SHOP MODAL -->
+  <div id="shopModal" class="modal">
+    <div class="absolute inset-0 bg-black/60" onclick="UI.closeShop()"></div>
+    <div class="relative glass rounded-2xl p-6 max-w-3xl w-full">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Llama Shop</h2>
+        <div class="text-sm text-white/70">Coins: <span id="shopCoins">0</span> • XP: <span id="shopXP">0</span></div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button class="tab-btn active" data-tab="hats" onclick="UI.switchShopTab('hats', this)">Hats</button>
+        <button class="tab-btn" data-tab="neckwear" onclick="UI.switchShopTab('neckwear', this)">Neckwear</button>
+        <button class="tab-btn" data-tab="pants" onclick="UI.switchShopTab('pants', this)">Pants</button>
+        <button class="tab-btn" data-tab="shoes" onclick="UI.switchShopTab('shoes', this)">Shoes</button>
+        <button class="tab-btn" data-tab="accessories" onclick="UI.switchShopTab('accessories', this)">Accessories</button>
+        <button class="tab-btn" data-tab="food" onclick="UI.switchShopTab('food', this)">Food</button>
+      </div>
+
+      <div id="shopGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+      <button onclick="UI.closeShop()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
     </div>
   </div>
 
-  <!-- Simple screens router -->
+  <!-- MOOD MODAL -->
+  <div id="moodModal" class="modal">
+    <div class="absolute inset-0 bg-black/60" onclick="UI.closeMoodModal()"></div>
+    <div class="relative glass rounded-2xl p-6 max-w-md w-full">
+      <h2 class="text-xl font-semibold mb-3">How are you feeling today?</h2>
+      <div class="grid grid-cols-5 gap-3">
+        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
+        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(2)">😕<div class="text-xs mt-1">2</div></button>
+        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(3)">🙂<div class="text-xs mt-1">3</div></button>
+        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(4)">😄<div class="text-xs mt-1">4</div></button>
+        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(5)">🤩<div class="text-xs mt-1">5</div></button>
+      </div>
+      <button onclick="UI.closeMoodModal()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
+    </div>
+  </div>
+
+  <!-- App Script -->
   <script>
+    /********************
+     * IMAGE CATALOG
+     * NOTE: If a link doesn't render, replace it with the direct image URL (.png/.jpg)
+     ********************/
+    const CATALOG = {
+      llamaBase: "https://postimg.cc/kRG7T3c3", // base llama image
+      // clothing & accessories (use TN for thumbnails, image for layer)
+      hats: [
+        { key:"cool_hat", name:"Cool Hat", thumb:"https://postimg.cc/q6Nd8cJp", image:"https://postimg.cc/dkHYkNKW", cost:{coins:20}, slot:"hat", offset:{x:0,y:-95,scale:1.0,rotate:0} },
+        { key:"silly_hat", name:"Silly Hat", thumb:"https://postimg.cc/gnyggXxp", image:"https://postimg.cc/wRLw83Fh", cost:{coins:14}, slot:"hat", offset:{x:0,y:-95,scale:1.0,rotate:0} },
+      ],
+      neckwear: [
+        { key:"cool_neck", name:"Cool Necktie", thumb:"https://postimg.cc/7bhD84gj", image:"https://postimg.cc/Q9xDMGv9", cost:{coins:12}, slot:"neck", offset:{x:0,y:20,scale:1.0,rotate:0} },
+        { key:"silly_neck", name:"Silly Neckwear", thumb:"https://postimg.cc/RNxP1QVG", image:"https://postimg.cc/gnyggXxp", cost:{coins:10}, slot:"neck", offset:{x:0,y:20,scale:1.0,rotate:0} },
+      ],
+      pants: [
+        { key:"cool_pants", name:"Cool Pants", thumb:"https://postimg.cc/TpW61cN9", image:"https://postimg.cc/Z95sBbKS", cost:{coins:18}, slot:"pants", offset:{x:0,y:70,scale:1.0,rotate:0} },
+        { key:"silly_pants", name:"Silly Pants", thumb:"https://postimg.cc/p9rkVsqV", image:"https://postimg.cc/4YBBTDvF", cost:{coins:15}, slot:"pants", offset:{x:0,y:70,scale:1.0,rotate:0} },
+      ],
+      shoes: [
+        { key:"cool_shoes", name:"Cool Shoes", thumb:"https://postimg.cc/Bj9GK1dG", image:"https://postimg.cc/Z0QmJQHnC", cost:{coins:14}, slot:"shoes", offset:{x:0,y:115,scale:1.0,rotate:0} },
+        { key:"silly_shoes", name:"Silly Shoes", thumb:"https://postimg.cc/VrbRn5x3", image:"https://postimg.cc/GBfK4v5F", cost:{coins:12}, slot:"shoes", offset:{x:0,y:115,scale:1.0,rotate:0} },
+      ],
+      accessories: [
+        { key:"sunglasses", name:"Sunglasses", thumb:"https://postimg.cc/d7JPWcsH", image:"https://postimg.cc/NK6v7jc2", cost:{coins:10}, slot:"accessory", offset:{x:0,y:-10,scale:1.0,rotate:0} },
+        { key:"clown_nose", name:"Clown Nose", thumb:"https://postimg.cc/w3mfsbH7", image:"https://postimg.cc/BLdmV25S", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-5,scale:1.0,rotate:0} },
+        { key:"cell_phone", name:"Cell Phone", thumb:"https://postimg.cc/kBCcRJfp", image:"https://postimg.cc/9rBBG6kF", cost:{coins:10}, slot:"accessory", offset:{x:40,y:40,scale:1.0,rotate:0} },
+        { key:"iced_coffee", name:"Iced Coffee", thumb:"https://postimg.cc/ZW7FQrZG", image:"https://postimg.cc/qNMxQmfc", cost:{coins:10}, slot:"accessory", offset:{x:-40,y:45,scale:1.0,rotate:0} },
+        { key:"tote_bag", name:"Tote Bag", thumb:"https://postimg.cc/bdx0PXpH", image:"https://postimg.cc/7JnSnzmQ", cost:{coins:10}, slot:"accessory", offset:{x:-10,y:50,scale:1.0,rotate:0} },
+        { key:"protein_shaker", name:"Protein Shaker", thumb:"https://postimg.cc/N2c1XD7H", image:"https://postimg.cc/qhnsgSnr", cost:{coins:8}, slot:"accessory", offset:{x:30,y:55,scale:1.0,rotate:0} },
+        { key:"mustache", name:"Mustache", thumb:"https://postimg.cc/1g8c1f3f", image:"https://postimg.cc/JyS3rMsK", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-2,scale:1.0,rotate:0} },
+      ],
+      // Food (emoji thumbnails in UI; consumables)
+      food: {
+        hay:     { label: "Hay", emoji: "🌾", hunger: 20, happiness: 2, cost: 5 },
+        carrot:  { label: "Carrot", emoji: "🥕", hunger: 15, happiness: 5, cost: 8 },
+        espresso:{ label: "Espresso", emoji: "☕", hunger: 0,  happiness: 8, cost: 10 }
+      }
+    };
+
     /***************
      * State model *
      ***************/
-    const STORAGE_KEY = "llamalog_state_v2";
-    const defaultFoods = {
-      hay: { label: "Hay", hunger: 20, happiness: 2, cost: 5 },
-      carrot: { label: "Carrot", hunger: 15, happiness: 5, cost: 8 },
-      espresso: { label: "Espresso", hunger: 0, happiness: 8, cost: 10 },
-      treat: { label: "Treat", hunger: 5, happiness: 10, cost: 12 }
-    };
-    const profanityList = [
-      "fuck","shit","bitch","asshole","dick","cunt","bastard","slut",
-      "whore","fag","nigger","retard","twat","prick","wank","bollock"
-    ];
+    const STORAGE_KEY = "llamalog_state_v3";
+    const profanityList = ["fuck","shit","bitch","asshole","dick","cunt","bastard","slut","whore","fag","nigger","retard","twat","prick","wank","bollock"];
 
     function loadState() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { teams: {} };
-      } catch {
-        return { teams: {} };
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { teams: {} }; }
+      catch { return { teams: {} }; }
     }
-    function saveState(state) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+    function saveState(state) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     function uid(len = 12) {
-      // Stronger team codes – base32-ish uppercase + digits with crypto
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       const arr = new Uint8Array(len);
       crypto.getRandomValues(arr);
       return Array.from(arr, b => chars[b % chars.length]).join("");
     }
-    function todayKey() {
-      const d = new Date(); return d.toISOString().slice(0,10);
-    }
+    function todayKey() { return new Date().toISOString().slice(0,10); }
 
     /****************
      * UI utilities *
      ****************/
     const UI = {
       show(id) {
-        document.querySelectorAll("section, #foodShopModal").forEach(s => s.classList.add("hidden"));
+        document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
         document.getElementById(id)?.classList.remove("hidden");
-        // route-specific refresh
         if (id === "managerDashboard") Screens.renderManager();
         if (id === "repDashboard") Screens.renderRep();
-        if (id === "managerApprovals") Screens.renderManager();
-        if (id === "foodShopModal") Screens.renderShop();
-      },
-      hide(id) {
-        document.getElementById(id)?.classList.add("hidden");
       },
       toast(msg, type = "info") {
         const container = document.getElementById("toastContainer");
@@ -432,10 +463,21 @@
           setTimeout(() => card.remove(), 250);
         }, 2500);
       },
-      format(name, max=24){
-        if(!name) return "";
-        return name.length>max ? name.slice(0,max-1)+"…" : name;
-      }
+      format(name, max=24){ if(!name) return ""; return name.length>max ? name.slice(0,max-1)+"…" : name; },
+
+      openShop(){
+        document.getElementById("shopModal").classList.add("show");
+        Screens.renderShop("hats");
+      },
+      closeShop(){ document.getElementById("shopModal").classList.remove("show"); },
+      switchShopTab(tab, btn){
+        document.querySelectorAll("#shopModal .tab-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        Screens.renderShop(tab);
+      },
+
+      openMoodModal(){ document.getElementById("moodModal").classList.add("show"); },
+      closeMoodModal(){ document.getElementById("moodModal").classList.remove("show"); }
     };
 
     /*****************
@@ -452,7 +494,7 @@
           teamName: "",
           managerEmail: "",
           createdAt: Date.now(),
-          activities: [],   // [{ label, target (optional) }]
+          activities: [],   // [{ label, target? }]
           pending: [],      // [{ email, firstName, requestedAt }]
           members: {}       // email -> member
         };
@@ -460,7 +502,6 @@
       },
       parseActivity(raw) {
         if (!raw) return null;
-        // Extract first integer + clean label without numbers
         const match = raw.match(/(\d+)/);
         const target = match ? parseInt(match[1],10) : null;
         let label = raw.replace(/\d+/g,"").trim();
@@ -472,25 +513,24 @@
           team.members[email] = {
             firstName: "",
             email,
-            coins: 0,
+            coins: 20,
             llama: {
               name: "",
-              hunger: 60,       // 0 to 100 (higher is fuller)
-              happiness: 60,    // 0 to 100
+              hunger: 60,
+              happiness: 60,
               xp: 0,
               level: 1,
               lastTick: Date.now(),
               fedStreak: 0
             },
-            inventory: { hay: 1, carrot: 1, espresso: 0, treat: 0 },
-            giftsInbox: [],    // [{from, itemKey, at}]
-            achievements: {
-              wellFedStreak: 0,
-              giftGiver: 0,
-              productStreak: 0
-            },
-            progress: {},      // date -> { [actIndex]: { count or done } }
-            checkins: {}       // date -> { mood, energy, breakMin }
+            // cosmetic + consumables
+            owned: {},            // key -> true (cosmetics)
+            equipped: { hat:null, neck:null, pants:null, shoes:null, accessories: [] },
+            inventory: { hay: 1, carrot: 1, espresso: 0 }, // food counts
+            giftsInbox: [],       // [{id, from, fromName, itemKey, at}]
+            achievements: { wellFedStreak: 0, giftGiver: 0, productStreak: 0 },
+            progress: {},         // date -> { [actIndex]: { count or done } }
+            checkins: {}          // date -> { mood }
           };
         }
         return team.members[email];
@@ -500,37 +540,28 @@
         const elapsedMin = Math.max(0, Math.round((now - (member.llama.lastTick || now)) / 60000));
         if (elapsedMin <= 0) return;
         member.llama.lastTick = now;
-
-        // Hunger decays slowly
         member.llama.hunger = Math.max(0, member.llama.hunger - 0.5 * (elapsedMin/5));
-        // Happiness influenced by hunger
         const hungerPenalty = member.llama.hunger < 30 ? 0.6 : member.llama.hunger < 50 ? 0.3 : 0;
         member.llama.happiness = Math.max(0, Math.min(100, member.llama.happiness - hungerPenalty * (elapsedMin/5)));
       },
       addXP(member, amount=2){
         member.llama.xp += amount;
-        // Level up every 50 XP
         while (member.llama.xp >= member.llama.level * 50) {
           member.llama.xp -= member.llama.level * 50;
           member.llama.level += 1;
           UI.toast("Your llama leveled up", "success");
         }
       },
-      feed(member, itemKey) {
-        const f = defaultFoods[itemKey];
-        if (!f) return false;
-        if ((member.inventory[itemKey] || 0) <= 0) return false;
-        member.inventory[itemKey] -= 1;
+      feed(member, key){
+        const f = CATALOG.food[key]; if (!f) return false;
+        if ((member.inventory[key]||0) <= 0) return false;
+        member.inventory[key] -= 1;
         member.llama.hunger = Math.min(100, member.llama.hunger + f.hunger);
         member.llama.happiness = Math.min(100, member.llama.happiness + f.happiness);
         member.llama.fedStreak = Math.min(365, (member.llama.fedStreak || 0) + 1);
         member.achievements.wellFedStreak = Math.max(member.achievements.wellFedStreak || 0, member.llama.fedStreak);
         Domain.addXP(member, 3);
         return true;
-      },
-      pet(member){
-        member.llama.happiness = Math.min(100, member.llama.happiness + 2);
-        Domain.addXP(member, 1);
       }
     };
 
@@ -538,9 +569,6 @@
      * Screen binds  *
      *****************/
     const Screens = {
-      ///////////////////////
-      // MANAGER DASHBOARD //
-      ///////////////////////
       renderManager(){
         const state = loadState();
         const team = state.teams[session.teamCode];
@@ -548,21 +576,19 @@
         document.getElementById("teamInfo").textContent =
           `Team ${team.teamName} • Code ${session.teamCode} • Manager ${team.managerEmail}`;
 
-        // Pending approvals
+        // Pending approvals (aligned buttons)
         const approvalsEl = document.getElementById("approvalsList");
         approvalsEl.innerHTML = "";
         (team.pending || []).forEach((p, idx) => {
           const row = document.createElement("div");
-          row.className = "flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3";
+          row.className = "grid grid-cols-5 items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3";
           row.innerHTML = `
-            <div>
+            <div class="col-span-3">
               <div class="font-medium">${UI.format(p.firstName)} <span class="text-white/60">(${UI.format(p.email)})</span></div>
               <div class="text-xs text-white/60">Requested ${new Date(p.requestedAt).toLocaleString()}</div>
             </div>
-            <div class="flex gap-2">
-              <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded" onclick="Handlers.approve(${idx})">Approve</button>
-              <button class="bg-rose-500 hover:bg-rose-600 px-3 py-1.5 rounded" onclick="Handlers.reject(${idx})">Reject</button>
-            </div>
+            <button class="col-span-1 bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded text-center" onclick="Handlers.approve(${idx})">Approve</button>
+            <button class="col-span-1 bg-rose-500 hover:bg-rose-600 px-3 py-2 rounded text-center" onclick="Handlers.reject(${idx})">Reject</button>
           `;
           approvalsEl.appendChild(row);
         });
@@ -582,10 +608,7 @@
 
         // Team mood chart (last 7 days)
         const moodChart = document.getElementById("moodChart");
-        const days = Array.from({length:7}).map((_,i)=> {
-          const d = new Date(); d.setDate(d.getDate() - (6-i));
-          return d.toISOString().slice(0,10);
-        });
+        const days = Array.from({length:7}).map((_,i)=> { const d = new Date(); d.setDate(d.getDate() - (6-i)); return d.toISOString().slice(0,10); });
         const points = days.map(day => {
           const vals = Object.values(team.members).map(m => m.checkins?.[day]?.mood).filter(v => typeof v === "number");
           if (!vals.length) return null;
@@ -593,9 +616,7 @@
           return Math.round(avg*10)/10;
         });
 
-        // Render simple SVG bars
-        const width = 520, height = 160, barW = 60, gap = 16;
-        const maxVal = 5;
+        const width = 520, height = 160, barW = 60, gap = 16, maxVal = 5;
         const svg = [
           `<svg width="${Math.max(width, (barW+gap)*7+gap)}" height="${height}" viewBox="0 0 ${Math.max(width, (barW+gap)*7+gap)} ${height}" xmlns="http://www.w3.org/2000/svg">`,
           `<rect x="0" y="0" width="100%" height="100%" fill="rgba(255,255,255,0.03)" rx="12"/>`
@@ -628,7 +649,7 @@
           lbEl.appendChild(row);
         });
 
-        // Gifting selectors
+        // Gifting selectors (food only)
         const recSel = document.getElementById("giftRecipient");
         recSel.innerHTML = "";
         Object.values(team.members).forEach(m=>{
@@ -636,18 +657,14 @@
           opt.value = m.email; opt.textContent = m.firstName || m.email;
           recSel.appendChild(opt);
         });
-        const giftSel = document.getElementById("giftItem");
-        giftSel.innerHTML = "";
-        Object.entries(defaultFoods).forEach(([k,v])=>{
+        const giftSel = document.getElementById("giftItem"); giftSel.innerHTML = "";
+        Object.entries(CATALOG.food).forEach(([k,v])=>{
           const opt = document.createElement("option");
-          opt.value = k; opt.textContent = `${v.label} (Cost ${v.cost})`;
+          opt.value = k; opt.textContent = `${v.emoji} ${v.label} (Cost ${v.cost})`;
           giftSel.appendChild(opt);
         });
       },
 
-      //////////////////
-      // REP DASHBOARD //
-      //////////////////
       renderRep(){
         const state = loadState();
         const team = state.teams[session.teamCode];
@@ -660,7 +677,7 @@
         document.getElementById("repFirstNameLabel").textContent = member.firstName || session.email;
         document.getElementById("repTeamNameLabel").textContent = team.teamName;
 
-        // Mood background swap based on happiness/hunger
+        // Mood background based on happiness/hunger
         const header = document.getElementById("repHeader");
         header.classList.remove("mood-happy","mood-sad","mood-angry","mood-energized");
         const h = member.llama.happiness, g = member.llama.hunger;
@@ -669,29 +686,20 @@
         else if (h < 45) header.classList.add("mood-sad");
         else header.classList.add("mood-energized");
 
-        // Llama panel
+        // Llama preview (base + layers)
+        document.getElementById("llama-base").src = CATALOG.llamaBase;
+        applyLayer("hat", member);
+        applyLayer("neck", member);
+        applyLayer("pants", member);
+        applyLayer("shoes", member);
+        applyAccessories(member);
+
+        // Stats bars
         document.getElementById("llamaNameLabel").textContent = member.llama.name || "Unnamed";
         document.getElementById("llamaLevel").textContent = member.llama.level;
         document.getElementById("llamaXP").textContent = member.llama.xp;
         document.getElementById("hungerBar").style.width = `${Math.round(member.llama.hunger)}%`;
         document.getElementById("happinessBar").style.width = `${Math.round(member.llama.happiness)}%`;
-
-        // Inventory list
-        const inv = document.getElementById("inventoryList");
-        inv.innerHTML = "";
-        Object.entries(member.inventory).forEach(([k,qty])=>{
-          const f = defaultFoods[k];
-          const item = document.createElement("div");
-          item.className = "bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between";
-          item.innerHTML = `
-            <div>
-              <div class="font-medium">${f.label}</div>
-              <div class="text-xs text-white/60">Qty ${qty}</div>
-            </div>
-            <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded text-sm" ${qty<=0?"disabled class='opacity-50 cursor-not-allowed'":""}
-              onclick="Handlers.feed('${k}')">Feed</button>`;
-          inv.appendChild(item);
-        });
 
         // Activities
         const list = document.getElementById("activitiesList");
@@ -750,7 +758,7 @@
         Object.entries(member.inventory).forEach(([k,qty])=>{
           if (qty>0){
             const opt = document.createElement("option");
-            opt.value = k; opt.textContent = `${defaultFoods[k].label} (You have ${qty})`;
+            opt.value = k; opt.textContent = `${CATALOG.food[k].emoji} ${CATALOG.food[k].label} (You have ${qty})`;
             itemSel.appendChild(opt);
           }
         });
@@ -761,7 +769,7 @@
         (member.giftsInbox || []).slice(-10).reverse().forEach(g=>{
           const row = document.createElement("div");
           row.className = "bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between";
-          row.innerHTML = `<div class="text-sm"><span class="text-white/80">Gift from ${UI.format(g.fromName || g.from)}</span> · ${defaultFoods[g.itemKey]?.label}</div>
+          row.innerHTML = `<div class="text-sm"><span class="text-white/80">Gift from ${UI.format(g.fromName || g.from)}</span> · ${CATALOG.food[g.itemKey]?.emoji} ${CATALOG.food[g.itemKey]?.label}</div>
             <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded text-sm" onclick="Handlers.claimGift('${g.id}')">Claim</button>`;
           inbox.appendChild(row);
         });
@@ -770,59 +778,109 @@
         const ach = document.getElementById("achievementsList");
         ach.innerHTML = "";
         const A = member.achievements;
-        [
-          ["Well fed streak", A.wellFedStreak || 0],
-          ["Gift giver", A.giftGiver || 0],
-          ["Productivity streak", A.productStreak || 0]
-        ].forEach(([name,val])=>{
-          const li = document.createElement("li");
-          li.textContent = `${name}: ${val}`;
-          ach.appendChild(li);
-        });
+        [["Well fed streak", A.wellFedStreak || 0],["Gift giver", A.giftGiver || 0],["Productivity streak", A.productStreak || 0]]
+          .forEach(([name,val])=>{ const li = document.createElement("li"); li.textContent = `${name}: ${val}`; ach.appendChild(li); });
       },
 
-      renderShop(){
-        // Rep shop content
+      renderShop(tab="hats"){
         const state = loadState();
         const team = state.teams[session.teamCode];
-        if (!team) return;
         const member = team.members[session.email];
-        const wrap = document.getElementById("shopItems");
-        wrap.innerHTML = "";
-        Object.entries(defaultFoods).forEach(([k,v])=>{
-          const row = document.createElement("div");
-          row.className = "flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3";
-          row.innerHTML = `
-            <div>
-              <div class="font-semibold">${v.label}</div>
-              <div class="text-xs text-white/60">Hunger +${v.hunger}, Happiness +${v.happiness}</div>
+        document.getElementById("shopCoins").textContent = member.coins;
+        document.getElementById("shopXP").textContent = member.llama.xp + (member.llama.level-1)*50;
+
+        const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
+
+        const addCard = (item, isFood=false)=>{
+          const owned = isFood ? (member.inventory[item.key]||0)>0 : !!member.owned[item.key];
+          const equipped = !isFood && (
+            member.equipped.hat===item.key ||
+            member.equipped.neck===item.key ||
+            member.equipped.pants===item.key ||
+            member.equipped.shoes===item.key ||
+            member.equipped.accessories.includes(item.key)
+          );
+
+          const div = document.createElement("div");
+          div.className = "bg-white/5 border border-white/10 rounded-xl p-3";
+          div.innerHTML = `
+            <div class="aspect-video bg-white/5 rounded-xl mb-2 flex items-center justify-center overflow-hidden">
+              ${isFood
+                ? `<div class="text-4xl">${item.emoji}</div>`
+                : `<img src="${item.thumb}" class="w-full h-full object-contain" alt="${item.name}" />`
+              }
             </div>
-            <button class="bg-indigo-500 hover:bg-indigo-600 px-3 py-1.5 rounded"
-              onclick="Handlers.buyItem('${k}', ${v.cost})">Buy ${v.cost} coins</button>`;
-          wrap.appendChild(row);
-        });
-        // Manager gifting shop uses separate selectors elsewhere
+            <div class="font-semibold">${isFood ? item.label : item.name}</div>
+            <div class="text-xs text-white/60 mb-2">${isFood ? `Cost ${item.cost} · You have ${(member.inventory[item.key]||0)}` : `Cost ${item.cost?.coins||0} · ${owned ? 'Owned' : 'Not owned'}`}</div>
+            <div class="grid grid-cols-2 gap-2">
+              ${isFood
+                ? `<button class="bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.buyFood('${item.key}')">Buy</button>
+                   <button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.feed('${item.key}')">Feed</button>`
+                : owned
+                  ? `<button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.equip('${item.key}')">${equipped ? 'Unequip':'Equip'}</button>
+                     <button class="bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded text-sm" onclick="Handlers.preview('${item.key}')">Preview</button>`
+                  : `<button class="col-span-2 bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.buy('${item.key}')">Buy</button>`
+              }
+            </div>
+          `;
+          grid.appendChild(div);
+        };
+
+        if (tab==="food"){
+          // Flatten food entries into array with key
+          Object.entries(CATALOG.food).forEach(([key,v])=> addCard({ ...v, key }, true));
+        } else {
+          (CATALOG[tab]||[]).forEach(addCard);
+        }
       }
     };
+
+    /****************
+     * Layer helpers
+     ****************/
+    function findItemByKey(key){
+      const groups = ["hats","neckwear","pants","shoes","accessories"];
+      for (const g of groups) { const f = (CATALOG[g]||[]).find(i=>i.key===key); if (f) return f; }
+      return null;
+    }
+    function applyLayer(slot, member){
+      const key = member.equipped[slot];
+      const imgEl = document.getElementById(`layer-${slot}`);
+      if (!key) { imgEl.src = ""; imgEl.style.transform = `translate(0,0) scale(1) rotate(0deg)`; return; }
+      const item = findItemByKey(key);
+      if (!item) return;
+      imgEl.src = item.image;
+      const o = item.offset || {x:0,y:0,scale:1,rotate:0};
+      imgEl.style.transform = `translate(${o.x}px, ${o.y}px) scale(${o.scale}) rotate(${o.rotate}deg)`;
+    }
+    function applyAccessories(member){
+      const wrap = document.getElementById("layer-accessories");
+      wrap.innerHTML = "";
+      (member.equipped.accessories||[]).forEach(key=>{
+        const item = findItemByKey(key); if (!item) return;
+        const img = document.createElement("img");
+        img.className = "llama-layer";
+        img.src = item.image;
+        const o = item.offset || {x:0,y:0,scale:1,rotate:0};
+        img.style.transform = `translate(${o.x}px, ${o.y}px) scale(${o.scale}) rotate(${o.rotate}deg)`;
+        wrap.appendChild(img);
+      });
+    }
 
     /****************
      * Event logic  *
      ****************/
     const Handlers = {
-      // Manager
+      // Auth
       createManagerAccount(e){
         e.preventDefault();
         const email = document.getElementById("managerEmail").value.trim().toLowerCase();
         const teamName = document.getElementById("teamName").value.trim();
         if (!email || !teamName) return;
-
         const state = loadState();
         const code = uid(10);
         const team = Domain.ensureTeam(state, code);
-        team.teamName = teamName;
-        team.managerEmail = email;
-        team.activities = []; team.pending = []; team.members = team.members || {};
-
+        team.teamName = teamName; team.managerEmail = email; team.activities = []; team.pending = []; team.members = team.members || {};
         saveState(state);
         session = { role: "manager", teamCode: code, email };
         UI.toast(`Team created. Code ${code}`, "success");
@@ -834,21 +892,24 @@
         const code = document.getElementById("loginTeamCode").value.trim().toUpperCase();
         const state = loadState();
         const team = state.teams[code];
-        if (!team || team.managerEmail !== email) {
-          return UI.toast("Invalid email or team code", "error");
-        }
+        if (!team || team.managerEmail !== email) return UI.toast("Invalid email or team code", "error");
         session = { role: "manager", teamCode: code, email };
         UI.show("managerDashboard");
       },
+      logout(){
+        session = { role:null, teamCode:null, email:null };
+        UI.toast("Signed out", "success");
+        UI.show("landingPage");
+      },
+
+      // Approvals
       approve(idx){
         const state = loadState();
         const team = state.teams[session.teamCode];
-        const p = team.pending[idx];
-        if (!p) return;
+        const p = team.pending[idx]; if (!p) return;
         const m = Domain.ensureMember(team, p.email);
         m.firstName = p.firstName;
-        // grant starter coins
-        m.coins = Math.max(m.coins, 10);
+        m.coins = Math.max(m.coins, 20);
         team.pending.splice(idx,1);
         saveState(state);
         UI.toast("Rep approved", "success");
@@ -863,13 +924,13 @@
         Screens.renderManager();
       },
       refreshApprovals(){ Screens.renderManager(); },
+
       saveActivities(e){
         e.preventDefault();
         const a = ["act1","act2","act3","act4"].map(id => Domain.parseActivity(document.getElementById(id).value.trim())).filter(Boolean);
         const state = loadState();
         const team = state.teams[session.teamCode];
         team.activities = a.slice(0,4);
-        // Publish to team: reset today progress scaffolding so everyone sees new slots
         const dayKey = todayKey();
         Object.values(team.members).forEach(m=>{
           m.progress[dayKey] = {};
@@ -881,72 +942,8 @@
         UI.toast("Activities saved and published to team", "success");
         Screens.renderManager();
       },
-      managerGift(e){
-        e.preventDefault();
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const recipientEmail = document.getElementById("giftRecipient").value;
-        const itemKey = document.getElementById("giftItem").value;
-        const rec = team.members[recipientEmail];
-        if (!rec) return UI.toast("No such team member", "error");
-        rec.giftsInbox.push({ id: uid(8), from: session.email, fromName: team.managerEmail, itemKey, at: Date.now() });
-        saveState(state);
-        UI.toast("Gift sent", "success");
-        Screens.renderManager();
-      },
 
-      exportPDF(){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        if (!team) return;
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-        const margin = 48;
-        let y = margin;
-
-        doc.setFont("helvetica","bold");
-        doc.setFontSize(18);
-        doc.text(`LlamaLog – Team Report`, margin, y);
-        doc.setFontSize(12);
-        doc.setFont("helvetica","normal");
-        y += 18;
-        doc.text(`Team: ${team.teamName}`, margin, y); y+=14;
-        doc.text(`Code: ${session.teamCode}`, margin, y); y+=14;
-        doc.text(`Manager: ${team.managerEmail}`, margin, y); y+=22;
-
-        doc.setFont("helvetica","bold");
-        doc.text("Members", margin, y); y+=14;
-        doc.setFont("helvetica","normal");
-
-        Object.values(team.members).forEach(m=>{
-          const line = `${m.firstName || m.email}  •  Lv ${m.llama.level}  •  Coins ${m.coins}`;
-          doc.text(line, margin, y); y+=14;
-        });
-
-        y+=10; doc.setFont("helvetica","bold"); doc.text("Daily Focus", margin, y); y+=14; doc.setFont("helvetica","normal");
-        team.activities.forEach((a,i)=>{
-          doc.text(`${i+1}. ${a.label}${a.target? " – Target "+a.target:""}`, margin, y); y+=14;
-        });
-
-        // Average mood last 7 days
-        y+=12; doc.setFont("helvetica","bold"); doc.text("Mood (last 7 days avg)", margin, y); y+=14;
-        doc.setFont("helvetica","normal");
-        const days = Array.from({length:7}).map((_,i)=> {
-          const d = new Date(); d.setDate(d.getDate() - (6-i));
-          return d.toISOString().slice(0,10);
-        });
-        days.forEach(day=>{
-          const vals = Object.values(team.members).map(m => m.checkins?.[day]?.mood).filter(v => typeof v === "number");
-          const avg = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : "–";
-          doc.text(`${day}: ${avg}`, margin, y); y+=14;
-        });
-
-        doc.save(`LlamaLog_${team.teamName}_report.pdf`);
-        UI.toast("PDF exported", "success");
-      },
-
-      // Rep
+      // Rep join/login
       repJoinTeam(e){
         e.preventDefault();
         const firstName = document.getElementById("repFirstName").value.trim();
@@ -955,15 +952,8 @@
         const state = loadState();
         const team = state.teams[code];
         if (!team) return UI.toast("Team code not found", "error");
-        // prevent duplicate pending
-        if (team.members[email]) {
-          session = { role: "rep", teamCode: code, email };
-          return UI.show("repDashboard");
-        }
-        if (team.pending.find(p=>p.email===email)) {
-          session = { role: "rep", teamCode: code, email };
-          return UI.show("pendingApproval");
-        }
+        if (team.members[email]) { session = { role: "rep", teamCode: code, email }; return UI.show("repDashboard"); }
+        if (team.pending.find(p=>p.email===email)) { session = { role: "rep", teamCode: code, email }; return UI.show("pendingApproval"); }
         team.pending.push({ email, firstName, requestedAt: Date.now() });
         saveState(state);
         session = { role: "rep", teamCode: code, email };
@@ -974,11 +964,7 @@
         const state = loadState();
         const team = state.teams[session.teamCode];
         if (!team) return UI.show("landingPage");
-        if (team.members[session.email]) {
-          UI.show("repDashboard");
-        } else {
-          UI.toast("Still pending", "warn");
-        }
+        if (team.members[session.email]) UI.show("repDashboard"); else UI.toast("Still pending", "warn");
       },
       repLogin(e){
         e.preventDefault();
@@ -987,130 +973,113 @@
         const state = loadState();
         const team = state.teams[code];
         if (!team || !team.members[email]) {
-          // If pending, go to pending screen
-          if (team && team.pending.find(p=>p.email===email)) {
-            session = { role: "rep", teamCode: code, email };
-            return UI.show("pendingApproval");
-          }
+          if (team && team.pending.find(p=>p.email===email)) { session = { role: "rep", teamCode: code, email }; return UI.show("pendingApproval"); }
           return UI.toast("Not approved yet or invalid", "error");
         }
         session = { role: "rep", teamCode: code, email };
         UI.show("repDashboard");
       },
 
+      // Llama + cosmetics
       promptRename(){
-        const newName = prompt("Enter llama name");
-        if (!newName) return;
+        const newName = prompt("Enter llama name"); if (!newName) return;
         const lower = newName.toLowerCase();
-        if (profanityList.some(bad => lower.includes(bad))) {
-          return UI.toast("Please use a different name", "error");
-        }
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        member.llama.name = newName.trim();
-        saveState(state);
-        UI.toast("Name updated", "success");
-        Screens.renderRep();
+        if (profanityList.some(bad => lower.includes(bad))) return UI.toast("Please use a different name", "error");
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        member.llama.name = newName.trim(); saveState(state); UI.toast("Name updated", "success"); Screens.renderRep();
       },
-      playPetting(){
-        // simple clicker – each click gives a tiny happiness bump
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        Domain.pet(member);
-        saveState(state);
-        UI.toast("Your llama feels cared for", "success");
-        Screens.renderRep();
+      preview(key){ // (visual only) set as equipped then revert? We'll just equip preview
+        this.equip(key);
       },
-      feed(itemKey){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        if (Domain.feed(member, itemKey)) {
-          member.coins += 1; // tiny reward
-          saveState(state);
-          UI.toast(`Fed ${defaultFoods[itemKey].label}`, "success");
-          Screens.renderRep();
-        } else {
-          UI.toast("No item available", "warn");
-        }
-      },
-      buyItem(itemKey, cost){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
+      buy(key){
+        const item = findItemByKey(key); if (!item) return;
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        const cost = item.cost?.coins || 0;
         if (member.coins < cost) return UI.toast("Not enough coins", "error");
         member.coins -= cost;
-        member.inventory[itemKey] = (member.inventory[itemKey] || 0) + 1;
+        member.owned[key] = true;
         saveState(state);
         UI.toast("Purchased", "success");
+        Screens.renderShop(); Screens.renderRep();
+      },
+      equip(key){
+        const item = findItemByKey(key); if (!item) return;
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        if (!member.owned[key]) return UI.toast("You don't own this yet", "warn");
+
+        if (item.slot === "accessory"){
+          const i = member.equipped.accessories.indexOf(key);
+          if (i>=0) member.equipped.accessories.splice(i,1); else member.equipped.accessories.push(key);
+        } else {
+          if (member.equipped[item.slot] === key) member.equipped[item.slot] = null;
+          else member.equipped[item.slot] = key;
+        }
+        saveState(state);
         Screens.renderRep(); Screens.renderShop();
       },
-      adjustProgress(idx, delta){
+
+      // Food
+      buyFood(key){
+        const f = CATALOG.food[key]; if (!f) return;
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        if (member.coins < f.cost) return UI.toast("Not enough coins", "error");
+        member.coins -= f.cost;
+        member.inventory[key] = (member.inventory[key]||0)+1;
+        saveState(state);
+        UI.toast("Food purchased", "success");
+        Screens.renderShop(); Screens.renderRep();
+      },
+      feed(key){
         const state = loadState();
         const team = state.teams[session.teamCode];
         const member = team.members[session.email];
-        const day = todayKey();
-        const act = team.activities[idx];
-        const slot = member.progress[day][idx];
-        if (!act?.target) return;
+        if (Domain.feed(member, key)) {
+          member.coins += 1;
+          saveState(state);
+          UI.toast(`Fed ${CATALOG.food[key].label}`, "success");
+          Screens.renderRep();
+        } else { UI.toast("No item available", "warn"); }
+      },
+
+      // Progress
+      adjustProgress(idx, delta){
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        const day = todayKey(); const act = team.activities[idx]; const slot = member.progress[day][idx]; if (!act?.target) return;
         slot.count = Math.max(0, Math.min(act.target, (slot.count||0) + delta));
-        // rewards when completing target
         if (slot.count === act.target) {
-          member.coins += 5;
-          member.llama.happiness = Math.min(100, member.llama.happiness + 5);
-          Domain.addXP(member, 4);
-          UI.toast(`Completed: ${act.label}`, "success");
+          member.coins += 5; member.llama.happiness = Math.min(100, member.llama.happiness + 5);
+          Domain.addXP(member, 4); UI.toast(`Completed: ${act.label}`, "success");
         }
-        saveState(state);
-        Screens.renderRep();
+        saveState(state); Screens.renderRep();
       },
       toggleDone(idx, checked){
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        const day = todayKey(); const slot = member.progress[day][idx]; slot.done = !!checked;
+        if (slot.done) { member.coins += 3; member.llama.happiness = Math.min(100, member.llama.happiness + 4); Domain.addXP(member, 3); }
+        saveState(state); Screens.renderRep();
+      },
+
+      // Mood (emoji modal)
+      submitMood(val){
         const state = loadState();
         const team = state.teams[session.teamCode];
         const member = team.members[session.email];
-        const day = todayKey();
-        const slot = member.progress[day][idx];
-        slot.done = !!checked;
-        if (slot.done) {
-          member.coins += 3;
-          member.llama.happiness = Math.min(100, member.llama.happiness + 4);
-          Domain.addXP(member, 3);
-        }
+        member.checkins[todayKey()] = { mood: val, at: Date.now() };
+        member.llama.happiness = Math.min(100, member.llama.happiness + Math.max(0, val-2));
         saveState(state);
+        UI.toast("Mood saved", "success");
+        UI.closeMoodModal();
         Screens.renderRep();
+        Screens.renderManager();
       },
-      submitCheckin(e){
-        e.preventDefault();
-        const mood = parseInt(document.getElementById("checkMood").value,10);
-        const energy = parseInt(document.getElementById("checkEnergy").value,10);
-        const breakMin = parseInt(document.getElementById("checkBreak").value,10);
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        member.checkins[todayKey()] = { mood, energy, breakMin, at: Date.now() };
-        // Simple effect: better mood gives instant happiness nudge
-        member.llama.happiness = Math.min(100, member.llama.happiness + Math.max(0, mood-2));
-        // Reminder toast
-        if (breakMin > 0) {
-          setTimeout(()=> UI.toast("Llama says: time to rest for a moment"), breakMin * 60000);
-        }
-        saveState(state);
-        UI.toast("Check in saved", "success");
-        Screens.renderRep();
-        Screens.renderManager(); // update chart if manager is open
-      },
+
+      // Gifts (food only)
       repGift(e){
         e.preventDefault();
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
         const recipientEmail = document.getElementById("repGiftRecipient").value;
         const itemKey = document.getElementById("repGiftItem").value;
         if ((member.inventory[itemKey] || 0) <= 0) return UI.toast("You do not have this item", "error");
-
         member.inventory[itemKey] -= 1;
         const rec = team.members[recipientEmail];
         rec.giftsInbox.push({ id: uid(8), from: session.email, fromName: member.firstName, itemKey, at: Date.now() });
@@ -1119,12 +1088,20 @@
         UI.toast("Gift sent", "success");
         Screens.renderRep();
       },
+      managerGift(e){
+        e.preventDefault();
+        const state = loadState(); const team = state.teams[session.teamCode];
+        const recipientEmail = document.getElementById("giftRecipient").value;
+        const itemKey = document.getElementById("giftItem").value;
+        const rec = team.members[recipientEmail];
+        rec.giftsInbox.push({ id: uid(8), from: session.email, fromName: team.managerEmail, itemKey, at: Date.now() });
+        saveState(state);
+        UI.toast("Gift sent", "success");
+        Screens.renderManager();
+      },
       claimGift(id){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        const idx = member.giftsInbox.findIndex(g=>g.id===id);
-        if (idx<0) return;
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        const idx = member.giftsInbox.findIndex(g=>g.id===id); if (idx<0) return;
         const g = member.giftsInbox[idx];
         member.inventory[g.itemKey] = (member.inventory[g.itemKey]||0) + 1;
         member.giftsInbox.splice(idx,1);
@@ -1135,28 +1112,11 @@
     };
 
     /********************
-     * Random messages  *
+     * Seed + router    *
      ********************/
-    const tips = [
-      "One more call can turn the day around",
-      "Small consistent steps create momentum",
-      "Try a five minute desk reset then dive in",
-      "Focus on one conversation that matters",
-      "Log progress as you go. Your llama loves it"
-    ];
-    function randomTip(){
-      UI.toast("Llama says: " + tips[Math.floor(Math.random()*tips.length)], "info");
-    }
-    // periodic nudge (every 4 minutes demo cycle)
-    setInterval(randomTip, 240000);
-
-    /********************
-     * Seed and router  *
-     ********************/
-    // Start in landing
     UI.show("landingPage");
 
-    // Demo seed if empty (optional)
+    // Optional seed
     (function seed(){
       const s = loadState();
       if (Object.keys(s.teams).length === 0) {
@@ -1174,33 +1134,23 @@
           pending: [],
           members: {}
         };
-        const m1 = Domain.ensureMember(s.teams[code], "alex@example.com");
-        m1.firstName = "Alex";
-        m1.coins = 20;
-        const m2 = Domain.ensureMember(s.teams[code], "casey@example.com");
-        m2.firstName = "Casey";
-        m2.coins = 12;
+        const m1 = Domain.ensureMember(s.teams[code], "alex@example.com"); m1.firstName = "Alex"; m1.coins = 35;
+        const m2 = Domain.ensureMember(s.teams[code], "casey@example.com"); m2.firstName = "Casey"; m2.coins = 22;
         saveState(s);
       }
     })();
 
-    // Lightweight heartbeat to keep llama state evolving while on page
+    // Heartbeat to decay hunger/happiness
     setInterval(()=>{
       if (!session.teamCode || !session.email) return;
-      const state = loadState();
-      const team = state.teams[session.teamCode];
-      if (!team) return;
-      const member = team.members[session.email];
-      if (!member) return;
-      Domain.tickLlama(member);
-      saveState(state);
-      // Live bars refresh on rep screen
+      const state = loadState(); const team = state.teams[session.teamCode]; if (!team) return;
+      const member = team.members[session.email]; if (!member) return;
+      Domain.tickLlama(member); saveState(state);
       if (!document.getElementById("repDashboard").classList.contains("hidden")) {
         document.getElementById("hungerBar").style.width = `${Math.round(member.llama.hunger)}%`;
         document.getElementById("happinessBar").style.width = `${Math.round(member.llama.happiness)}%`;
       }
-    }, 30000); // every 30s
-
+    }, 30000);
   </script>
 </body>
 </html>
