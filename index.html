@@ -14,8 +14,9 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 .tab-btn.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
 .modal{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal.show{display:flex}
+.modal-open{overflow:hidden}
 .llama-canvas{position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.llama-stack{position:relative;width:100%;height:100%;transform:scale(var(--llama-scale,1));transform-origin:center}
+.llama-stack{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%) scale(var(--llama-scale,1));transform-origin:center}
 .llama-layer{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
 .icon-btn{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem}
 .notif{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:9999px;font-size:10px;line-height:1;padding:2px 5px}
@@ -132,18 +133,8 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
         <button onclick="Handlers.refreshApprovals?.()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">Refresh</button>
       </div>
 
-      <div class="glass rounded-2xl p-6 lg:col-span-2">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold mb-2">Daily focus</h2>
-          <span class="text-white/60 text-sm">“Log 3 calls” auto-detects the 3</span>
-        </div>
-        <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
-          <input id="act1" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 1">
-          <input id="act2" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 2">
-          <input id="act3" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 3">
-          <input id="act4" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 4">
-          <button class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
-        </form>
+      <div class="glass rounded-2xl p-6 lg:col-span-2" id="activitiesWrap">
+        <!-- Filled by renderManager (collapsible) -->
       </div>
 
       <div class="glass rounded-2xl p-6 lg:col-span-2">
@@ -167,7 +158,6 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
             <h1 class="text-2xl font-bold">Welcome back, <span id="repFirstNameLabel">Rep</span></h1>
             <p class="text-white/80 text-sm">Team <span id="repTeamNameLabel"></span></p>
             <div class="text-xs text-white/70" id="streakLabel">Streak: 0</div>
-            <div class="text-xs text-white/70" id="vibeLabel">No vibe set yet</div>
           </div>
         </div>
         <div class="flex items-center gap-3">
@@ -207,13 +197,6 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
           <div>
             <div class="text-sm mb-1">Happiness</div>
             <div class="w-full bg-white/10 h-3 rounded"><div id="happinessBar" class="h-3 rounded bg-emerald-400" style="width:50%"></div></div>
-          </div>
-
-          <!-- Habit Chains -->
-          <div class="grid grid-cols-3 gap-2 mt-2">
-            <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
-            <button onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
-            <button onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
           </div>
         </div>
       </div>
@@ -283,11 +266,11 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
       <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMood()">✕</button>
     </div>
     <div class="grid grid-cols-5 gap-3">
-      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
-      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(2)">😕<div class="text-xs mt-1">2</div></button>
-      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(3)">🙂<div class="text-xs mt-1">3</div></button>
-      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(4)">😄<div class="text-xs mt-1">4</div></button>
-      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(5)">🤩<div class="text-xs mt-1">5</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitReport({preventDefault:()=>{}},1)">😫<div class="text-xs mt-1">1</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitReport({preventDefault:()=>{}},2)">😕<div class="text-xs mt-1">2</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitReport({preventDefault:()=>{}},3)">🙂<div class="text-xs mt-1">3</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitReport({preventDefault:()=>{}},4)">😄<div class="text-xs mt-1">4</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitReport({preventDefault:()=>{}},5)">🤩<div class="text-xs mt-1">5</div></button>
     </div>
   </div>
 </div>
@@ -314,24 +297,24 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   </div>
 </div>
 
-<!-- TOUR MODAL -->
-<div id="tourModal" class="modal">
-  <div class="absolute inset-0 bg-black/60" onclick="UI.closeTour()"></div>
-  <div class="relative glass rounded-2xl p-6 max-w-md w-full">
+<!-- CHAT MODAL -->
+<div id="chatModal" class="modal">
+  <div class="absolute inset-0 bg-black/60" onclick="UI.closeChat()"></div>
+  <div class="relative glass rounded-2xl p-6 max-w-2xl w-full">
     <div class="flex items-center justify-between mb-2">
-      <h2 id="tourTitle" class="text-xl font-semibold">Welcome!</h2>
-      <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeTour()">✕</button>
+      <h2 class="text-xl font-semibold">Team Chat</h2>
+      <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeChat()">✕</button>
     </div>
-    <div id="tourDesc" class="text-sm text-white/80 mb-4">Quick tour text…</div>
-    <div class="flex justify-between">
-      <button id="tourPrev" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded" onclick="Handlers.tourPrev()">Back</button>
-      <button id="tourNext" class="btn-grad px-3 py-1.5 rounded" onclick="Handlers.tourNext()">Next</button>
-    </div>
+    <div id="chatFeed" class="h-80 overflow-auto space-y-2 mb-3"></div>
+    <form onsubmit="Handlers.sendChat(event)" class="flex gap-2">
+      <input id="chatInput" class="flex-1 bg-white/10 border border-white/20 rounded-xl p-2" placeholder="Say hi…">
+      <button class="btn-grad px-3 py-2 rounded">Send</button>
+    </form>
   </div>
 </div>
 
 <!-- Scripts -->
-<script src="assets-config.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="assets-config.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
