@@ -1,9 +1,9 @@
+
 // IMAGES & CATALOG
 window.CATALOG = {
   llamaBase: "https://i.imgur.com/zgQ8490.png",
 
   hats: [
-    // Cool Hat TN was provided as a blob; we’ll fall back to full image for thumb.
     { key:"cool_hat",  name:"Cool Hat",
       thumb:"https://i.imgur.com/r6L0Yg1.png", image:"https://i.imgur.com/r6L0Yg1.png",
       cost:{coins:20}, slot:"hat" },
@@ -72,7 +72,7 @@ window.CATALOG = {
     espresso: { key:"espresso", label:"Espresso", emoji:"☕", hunger:0,  happiness:8, cost:10 }
   },
 
-  // PETS (emoji-based display for now; unlock via Pet Shelter)
+  // PETS (locked by Pet Shelter)
   pets: [
     { key:"mini_alpaca", label:"Mini Alpaca 🍼", cost:30, buff:"+1 coin on path complete" },
     { key:"pika",        label:"Pika 🐭",        cost:28, buff:"+1 XP on feed" },
@@ -80,7 +80,7 @@ window.CATALOG = {
   ]
 };
 
-// BUILDINGS (per-rep; 15s demo timers)
+// BUILDINGS (per-rep; ~15s demo timers)
 window.BUILDINGS = [
   { key:"networking_center", name:"Networking Center", cost:40, mins:0.25, unlocks:["chat","gifting"], rareDrop:"sunglasses" },
   { key:"market",            name:"Market",            cost:30, mins:0.25, unlocks:["food"],           rareDrop:"protein_shaker" },
