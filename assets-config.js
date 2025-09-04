@@ -1,5 +1,5 @@
+// assets-config.js
 
-// IMAGES & CATALOG
 window.CATALOG = {
   llamaBase: "https://i.imgur.com/zgQ8490.png",
 
@@ -72,7 +72,6 @@ window.CATALOG = {
     espresso: { key:"espresso", label:"Espresso", emoji:"☕", hunger:0,  happiness:8, cost:10 }
   },
 
-  // PETS (locked by Pet Shelter)
   pets: [
     { key:"mini_alpaca", label:"Mini Alpaca 🍼", cost:30, buff:"+1 coin on path complete" },
     { key:"pika",        label:"Pika 🐭",        cost:28, buff:"+1 XP on feed" },
@@ -80,7 +79,6 @@ window.CATALOG = {
   ]
 };
 
-// BUILDINGS (per-rep; ~15s demo timers)
 window.BUILDINGS = [
   { key:"networking_center", name:"Networking Center", cost:40, mins:0.25, unlocks:["chat","gifting"], rareDrop:"sunglasses" },
   { key:"market",            name:"Market",            cost:30, mins:0.25, unlocks:["food"],           rareDrop:"protein_shaker" },
@@ -95,3 +93,4 @@ window.BUILDINGS = [
   { key:"arcade",            name:"Arcade",            cost:50, mins:0.25, unlocks:["perk:celebration"] },
   { key:"observatory",       name:"Observatory",       cost:35, mins:0.25, unlocks:["perk:quest"] }
 ];
+
