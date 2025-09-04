@@ -1,186 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-  <title>LlamaLog – Team Productivity Platform</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-    body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18)}
-    .grad{background:linear-gradient(135deg,#1e1b4b,#0f172a 55%,#0b1229)}
-    .tab-btn{padding:.5rem .75rem;border-radius:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
-    .tab-btn.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
-    .modal{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:1rem}
-    .modal.show{display:flex}
-    .llama-canvas{position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden}
-    .llama-layer{position:absolute;inset:0;object-fit:contain;transform-origin:center;pointer-events:none}
-    .icon-btn{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem}
-    .mood-happy{background:linear-gradient(135deg,#0ea5e9,#22c55e 60%)}
-    .mood-sad{background:linear-gradient(135deg,#3b82f6,#0ea5e9 60%)}
-    .mood-angry{background:linear-gradient(135deg,#ef4444,#f97316 60%)}
-    .mood-energized{background:linear-gradient(135deg,#8b5cf6,#06b6d4 60%)}
-    .badge{display:inline-flex;gap:.5rem;align-items:center;padding:.35rem .55rem;border-radius:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
-    .btn-grad{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
-    .btn-grad-2{background:linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%)}
-    .notif{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:9999px;font-size:10px;line-height:1;padding:2px 5px}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+<title>LlamaLog – Team Productivity Platform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18)}
+.grad{background:linear-gradient(135deg,#1e1b4b,#0f172a 55%,#0b1229)}
+.tab-btn{padding:.5rem .75rem;border-radius:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.tab-btn.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+.modal{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal.show{display:flex}
+.llama-canvas{position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.llama-stack{position:relative;width:100%;height:100%;transform:scale(var(--llama-scale,1));transform-origin:center}
+.llama-layer{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
+.icon-btn{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem}
+.notif{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:9999px;font-size:10px;line-height:1;padding:2px 5px}
+.btn-grad{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+.btn-grad-2{background:linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%)}
+</style>
 </head>
 <body class="grad min-h-screen text-white">
-  <div id="toastContainer" class="fixed top-4 right-4 space-y-2 z-[9999]"></div>
+<div id="toastContainer" class="fixed top-4 right-4 space-y-2 z-[9999]"></div>
 
-  <!-- Landing -->
-  <section id="landingPage" class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
-      <div class="text-6xl mb-4">🦙</div>
-      <h1 class="text-4xl font-bold mb-2">LlamaLog</h1>
-      <p class="text-white/80 mb-8">Make work feel lighter with a caring llama and friendly team goals</p>
-      <div class="space-y-4">
-        <button onclick="UI.show('managerSignup')" class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Manager – Create Team</button>
-        <button onclick="UI.show('managerLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Manager – Access Homebase</button>
-        <button onclick="UI.show('repJoin')" class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Rep – Join Team</button>
-        <button onclick="UI.show('repLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Rep – Access Dashboard</button>
+<!-- Landing -->
+<section id="landingPage" class="min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
+    <div class="text-6xl mb-4">🦙</div>
+    <h1 class="text-4xl font-bold mb-2">LlamaLog</h1>
+    <p class="text-white/80 mb-8">Make work feel lighter with a caring llama and friendly team goals</p>
+    <div class="space-y-4">
+      <button onclick="UI.show('managerSignup')" class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Manager – Create Team</button>
+      <button onclick="UI.show('managerLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Manager – Access Homebase</button>
+      <button onclick="UI.show('repJoin')" class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Rep – Join Team</button>
+      <button onclick="UI.show('repLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Rep – Access Dashboard</button>
+    </div>
+  </div>
+</section>
+
+<!-- Manager Signup -->
+<section id="managerSignup" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full">
+    <h2 class="text-3xl font-bold mb-6 text-center">Create Your Team</h2>
+    <form onsubmit="Handlers.createManagerAccount(event)" class="space-y-4">
+      <input id="managerEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <input id="teamName" type="text" placeholder="Team name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Create Team & Code</button>
+    </form>
+    <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
+  </div>
+</section>
+
+<!-- Manager Login -->
+<section id="managerLogin" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full">
+    <h2 class="text-3xl font-bold mb-6 text-center">Access Homebase</h2>
+    <form onsubmit="Handlers.managerLogin(event)" class="space-y-4">
+      <input id="loginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <input id="loginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
+    </form>
+    <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
+  </div>
+</section>
+
+<!-- Rep Join -->
+<section id="repJoin" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full">
+    <h2 class="text-3xl font-bold mb-6 text-center">Join Your Team</h2>
+    <form onsubmit="Handlers.repJoinTeam(event)" class="space-y-4">
+      <input id="repFirstName" type="text" placeholder="Your first name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <input id="repEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <input id="repTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Request to Join</button>
+    </form>
+    <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
+  </div>
+</section>
+
+<!-- Rep Login -->
+<section id="repLogin" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full">
+    <h2 class="text-3xl font-bold mb-6 text-center">Access Your Dashboard</h2>
+    <form onsubmit="Handlers.repLogin(event)" class="space-y-4">
+      <input id="repLoginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <input id="repLoginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+      <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
+    </form>
+    <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
+  </div>
+</section>
+
+<!-- Pending -->
+<section id="pendingApproval" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
+    <div class="text-6xl mb-4">⏳</div>
+    <h2 class="text-3xl font-bold mb-3">Approval Pending</h2>
+    <p class="text-white/80 mb-6">Your manager will approve your request soon</p>
+    <button onclick="Handlers.checkApprovalStatus()" class="bg-sky-500 hover:bg-sky-600 py-2 px-6 rounded-xl transition">Check Status</button>
+    <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
+  </div>
+</section>
+
+<!-- Manager Dashboard -->
+<section id="managerDashboard" class="hidden min-h-screen p-4">
+  <div class="max-w-7xl mx-auto space-y-6">
+    <div class="glass rounded-2xl p-6">
+      <div class="flex flex-wrap gap-4 items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold">Manager Homebase</h1>
+          <p class="text-white/80" id="teamInfo">Team: Loading…</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
+            <span>🔔</span>
+            <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded">0</span>
+          </button>
+          <button data-btn="chat" onclick="UI.openChat()" class="relative px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Team chat <span id="chatBadgeMgr" class="notif hidden">0</span></button>
+          <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Manager Signup -->
-  <section id="managerSignup" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full">
-      <h2 class="text-3xl font-bold mb-6 text-center">Create Your Team</h2>
-      <form onsubmit="Handlers.createManagerAccount(event)" class="space-y-4">
-        <input id="managerEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <input id="teamName" type="text" placeholder="Team name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Create Team & Code</button>
-      </form>
-      <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
-    </div>
-  </section>
-
-  <!-- Manager Login -->
-  <section id="managerLogin" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full">
-      <h2 class="text-3xl font-bold mb-6 text-center">Access Homebase</h2>
-      <form onsubmit="Handlers.managerLogin(event)" class="space-y-4">
-        <input id="loginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <input id="loginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
-      </form>
-      <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
-    </div>
-  </section>
-
-  <!-- Rep Join -->
-  <section id="repJoin" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full">
-      <h2 class="text-3xl font-bold mb-6 text-center">Join Your Team</h2>
-      <form onsubmit="Handlers.repJoinTeam(event)" class="space-y-4">
-        <input id="repFirstName" type="text" placeholder="Your first name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <input id="repEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <input id="repTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Request to Join</button>
-      </form>
-      <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
-    </div>
-  </section>
-
-  <!-- Rep Login -->
-  <section id="repLogin" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full">
-      <h2 class="text-3xl font-bold mb-6 text-center">Access Your Dashboard</h2>
-      <form onsubmit="Handlers.repLogin(event)" class="space-y-4">
-        <input id="repLoginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <input id="repLoginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
-        <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
-      </form>
-      <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
-    </div>
-  </section>
-
-  <!-- Pending -->
-  <section id="pendingApproval" class="hidden min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
-      <div class="text-6xl mb-4">⏳</div>
-      <h2 class="text-3xl font-bold mb-3">Approval Pending</h2>
-      <p class="text-white/80 mb-6">Your manager will approve your request soon</p>
-      <button onclick="Handlers.checkApprovalStatus()" class="bg-sky-500 hover:bg-sky-600 py-2 px-6 rounded-xl transition">Check Status</button>
-      <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
-    </div>
-  </section>
-
-  <!-- Manager Dashboard -->
-  <section id="managerDashboard" class="hidden min-h-screen p-4">
-    <div class="max-w-7xl mx-auto space-y-6">
+    <div class="grid lg:grid-cols-3 gap-6">
       <div class="glass rounded-2xl p-6">
-        <div class="flex flex-wrap gap-4 items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold">Manager Homebase</h1>
-            <p class="text-white/80" id="teamInfo">Team: Loading…</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
-              <span>🔔</span>
-              <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded">0</span>
-            </button>
-            <button data-btn="chat" onclick="UI.openChat()" class="relative px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Team chat <span id="chatBadgeMgr" class="notif hidden">0</span></button>
-            <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
-          </div>
-        </div>
+        <h2 class="text-xl font-semibold mb-3">Pending approvals</h2>
+        <div id="approvalsList" class="space-y-3"></div>
+        <button onclick="Handlers.refreshApprovals?.()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">Refresh</button>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-6">
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Pending approvals</h2>
-          <div id="approvalsList" class="space-y-3"></div>
-          <button onclick="Handlers.refreshApprovals()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">Refresh</button>
+      <div class="glass rounded-2xl p-6 lg:col-span-2">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold mb-2">Daily focus</h2>
+          <span class="text-white/60 text-sm">“Log 3 calls” auto-detects the 3</span>
         </div>
+        <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
+          <input id="act1" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 1">
+          <input id="act2" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 2">
+          <input id="act3" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 3">
+          <input id="act4" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 4">
+          <button class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
+        </form>
+      </div>
 
-        <div class="glass rounded-2xl p-6 lg:col-span-2">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-2">Daily focus</h2>
-            <span class="text-white/60 text-sm">“Log 3 calls” auto-detects the 3</span>
+      <div class="glass rounded-2xl p-6 lg:col-span-2">
+        <h2 class="text-xl font-semibold mb-3">Recent Rep Reports</h2>
+        <div id="reportsList" class="space-y-3"></div>
+      </div>
+
+      <div class="glass rounded-2xl p-6" id="townPanel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Rep Dashboard -->
+<section id="repDashboard" class="hidden min-h-screen p-4">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <div id="repHeader" class="rounded-2xl p-6 glass">
+      <div class="flex flex-wrap gap-4 items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="text-5xl">🦙</div>
+          <div>
+            <h1 class="text-2xl font-bold">Welcome back, <span id="repFirstNameLabel">Rep</span></h1>
+            <p class="text-white/80 text-sm">Team <span id="repTeamNameLabel"></span></p>
+            <div class="text-xs text-white/70" id="streakLabel">Streak: 0</div>
+            <div class="text-xs text-white/70" id="vibeLabel">No vibe set yet</div>
           </div>
-          <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
-            <input id="act1" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 1">
-            <input id="act2" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 2">
-            <input id="act3" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 3">
-            <input id="act4" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 4">
-            <button class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
-          </form>
         </div>
-
-        <div class="glass rounded-2xl p-6 lg:col-span-3" id="townPanel"></div>
+        <div class="flex items-center gap-3">
+          <button class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" onclick="UI.openMood()">Daily mood</button>
+          <button class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600" onclick="UI.openShop()">Open shop</button>
+          <button data-btn="chat" class="relative px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600" onclick="UI.openChat()">Team chat <span id="chatBadgeRep" class="notif hidden">0</span></button>
+          <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Rep Dashboard -->
-  <section id="repDashboard" class="hidden min-h-screen p-4">
-    <div class="max-w-6xl mx-auto space-y-6">
-      <div id="repHeader" class="rounded-2xl p-6 glass">
-        <div class="flex flex-wrap gap-4 items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="text-5xl">🦙</div>
-            <div>
-              <h1 class="text-2xl font-bold">Welcome back, <span id="repFirstNameLabel">Rep</span></h1>
-              <p class="text-white/80 text-sm">Team <span id="repTeamNameLabel"></span></p>
-              <div class="text-xs text-white/70" id="streakLabel">Streak: 0</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" onclick="UI.openMood()">Daily mood</button>
-            <button class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600" onclick="UI.openShop()">Open shop</button>
-            <button data-btn="chat" class="relative px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600" onclick="UI.openChat()">Team chat <span id="chatBadgeRep" class="notif hidden">0</span></button>
-            <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-3 gap-6">
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Your llama</h2>
-          <div id="llamaCanvas" class="llama-canvas">
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="glass rounded-2xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Your llama</h2>
+        <div id="llamaCanvas" class="llama-canvas">
+          <div id="llamaStack" class="llama-stack">
             <img id="llama-base" class="llama-layer" alt="llama" src="">
             <img id="layer-hat" class="llama-layer" alt="">
             <img id="layer-neck" class="llama-layer" alt="">
@@ -188,125 +191,147 @@
             <img id="layer-shoes" class="llama-layer" alt="">
             <div id="layer-accessories" class="llama-layer" style="position:absolute;inset:0;"></div>
           </div>
-          <div class="space-y-3 mt-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-semibold">Name: <span id="llamaNameLabel">Unnamed</span></div>
-                <div class="text-sm text-white/70">Level <span id="llamaLevel">1</span> · XP <span id="llamaXP">0</span></div>
-              </div>
-              <button class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-sm" onclick="Handlers.promptRename()">Update Name</button>
-            </div>
+        </div>
+        <div class="space-y-3 mt-4">
+          <div class="flex items-center justify-between">
             <div>
-              <div class="text-sm mb-1">Hunger</div>
-              <div class="w-full bg-white/10 h-3 rounded"><div id="hungerBar" class="h-3 rounded bg-amber-400" style="width:50%"></div></div>
+              <div class="font-semibold">Name: <span id="llamaNameLabel">Unnamed</span></div>
+              <div class="text-sm text-white/70">Level <span id="llamaLevel">1</span> · XP <span id="llamaXP">0</span></div>
             </div>
-            <div>
-              <div class="text-sm mb-1">Happiness</div>
-              <div class="w-full bg-white/10 h-3 rounded"><div id="happinessBar" class="h-3 rounded bg-emerald-400" style="width:50%"></div></div>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <button data-btn="food" onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
-              <button data-btn="food" onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
-              <button data-btn="food" onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
-            </div>
+            <button class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-sm" onclick="Handlers.promptRename()">Update Name</button>
+          </div>
+          <div>
+            <div class="text-sm mb-1">Hunger</div>
+            <div class="w-full bg-white/10 h-3 rounded"><div id="hungerBar" class="h-3 rounded bg-amber-400" style="width:50%"></div></div>
+          </div>
+          <div>
+            <div class="text-sm mb-1">Happiness</div>
+            <div class="w-full bg-white/10 h-3 rounded"><div id="happinessBar" class="h-3 rounded bg-emerald-400" style="width:50%"></div></div>
+          </div>
+
+          <!-- Habit Chains -->
+          <div class="grid grid-cols-3 gap-2 mt-2">
+            <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
+            <button onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
+            <button onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
           </div>
         </div>
+      </div>
 
-        <div class="glass rounded-2xl p-6 lg:col-span-2">
-          <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-1">Today’s path</h2><span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span></div>
-          <div id="pathNodes" class="flex flex-wrap gap-3 mt-2"></div>
-          <div id="activitiesList" class="mt-4 space-y-3"></div>
-        </div>
+      <div class="glass rounded-2xl p-6 lg:col-span-2">
+        <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-1">Today’s path</h2><span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span></div>
+        <div id="pathNodes" class="flex flex-wrap gap-3 mt-2"></div>
+        <div id="activitiesList" class="mt-4 space-y-3"></div>
+        <div class="mt-4 text-sm text-white/70" id="coinsLabel">Coins: 0</div>
+      </div>
 
-        <div class="glass rounded-2xl p-6 lg:col-span-2">
-          <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Team social</h2><span id="coinsLabel" class="text-sm text-white/70">Coins: 0</span></div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <h3 class="font-semibold mb-2">Send a food gift</h3>
-              <form onsubmit="Handlers.repGift(event)" class="grid grid-cols-3 gap-2">
-                <select id="repGiftRecipient" class="bg-white/10 border border-white/20 rounded-xl p-2 col-span-2"></select>
-                <select id="repGiftItem" class="bg-white/10 border border-white/20 rounded-xl p-2"></select>
-                <button class="btn-grad rounded-xl py-2 col-span-3 font-semibold hover:brightness-110 transition">Send</button>
-              </form>
-            </div>
-            <div>
-              <h3 class="font-semibold mb-2">Inbox</h3>
-              <div id="giftInbox" class="space-y-2"></div>
-            </div>
+      <div class="glass rounded-2xl p-6 lg:col-span-2">
+        <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Team social</h2></div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-semibold mb-2">Send a food gift</h3>
+            <form onsubmit="Handlers.repGift(event)" class="grid grid-cols-3 gap-2">
+              <select id="repGiftRecipient" class="bg-white/10 border border-white/20 rounded-xl p-2 col-span-2"></select>
+              <select id="repGiftItem" class="bg-white/10 border border-white/20 rounded-xl p-2"></select>
+              <button class="btn-grad rounded-xl py-2 col-span-3 font-semibold hover:brightness-110 transition">Send</button>
+            </form>
           </div>
-        </div>
-
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Badges</h2>
-          <div id="badgesGrid" class="grid grid-cols-2 gap-2"></div>
+          <div>
+            <h3 class="font-semibold mb-2">Inbox</h3>
+            <div id="giftInbox" class="space-y-2"></div>
+          </div>
         </div>
       </div>
 
       <div class="glass rounded-2xl p-6" id="townPanel"></div>
     </div>
-  </section>
-
-  <!-- SHOP MODAL -->
-  <div id="shopModal" class="modal">
-    <div class="absolute inset-0 bg-black/60" onclick="UI.closeShop()"></div>
-    <div class="relative glass rounded-2xl p-6 max-w-4xl w-full">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Llama Shop</h2>
-        <div class="flex items-center gap-2">
-          <div class="text-sm text-white/70">Coins: <span id="shopCoins">0</span> • XP: <span id="shopXP">0</span></div>
-          <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeShop()">✕</button>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2 mb-4">
-        <button class="tab-btn active" data-tab="hats" onclick="UI.switchShopTab('hats', this)">Hats</button>
-        <button class="tab-btn" data-tab="neckwear" onclick="UI.switchShopTab('neckwear', this)">Neckwear</button>
-        <button class="tab-btn" data-tab="accessories" onclick="UI.switchShopTab('accessories', this)">Accessories</button>
-        <button class="tab-btn" data-tab="pants" onclick="UI.switchShopTab('pants', this)">Pants</button>
-        <button class="tab-btn" data-tab="shoes" onclick="UI.switchShopTab('shoes', this)">Shoes</button>
-        <button class="tab-btn" data-tab="background" onclick="UI.switchShopTab('background', this)">Background</button>
-        <button class="tab-btn" data-tab="food" onclick="UI.switchShopTab('food', this)">Food</button>
-      </div>
-      <div id="shopGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      <button onclick="UI.closeShop()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
-    </div>
   </div>
+</section>
 
-  <!-- MOOD MODAL -->
-  <div id="moodModal" class="modal">
-    <div class="absolute inset-0 bg-black/60" onclick="UI.closeMood()"></div>
-    <div class="relative glass rounded-2xl p-6 max-w-md w-full">
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="text-xl font-semibold">How are you feeling?</h2>
-        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMood()">✕</button>
-      </div>
-      <div class="grid grid-cols-5 gap-3">
-        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
-        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(2)">😕<div class="text-xs mt-1">2</div></button>
-        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(3)">🙂<div class="text-xs mt-1">3</div></button>
-        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(4)">😄<div class="text-xs mt-1">4</div></button>
-        <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(5)">🤩<div class="text-xs mt-1">5</div></button>
+<!-- SHOP MODAL -->
+<div id="shopModal" class="modal">
+  <div class="absolute inset-0 bg-black/60" onclick="UI.closeShop()"></div>
+  <div class="relative glass rounded-2xl p-6 max-w-4xl w-full">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold">Llama Shop</h2>
+      <div class="flex items-center gap-2">
+        <div class="text-sm text-white/70">Coins: <span id="shopCoins">0</span> • XP: <span id="shopXP">0</span></div>
+        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeShop()">✕</button>
       </div>
     </div>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button class="tab-btn active" data-tab="hats" onclick="UI.switchShopTab('hats', this)">Hats</button>
+      <button class="tab-btn" data-tab="neckwear" onclick="UI.switchShopTab('neckwear', this)">Neckwear</button>
+      <button class="tab-btn" data-tab="accessories" onclick="UI.switchShopTab('accessories', this)">Accessories</button>
+      <button class="tab-btn" data-tab="pants" onclick="UI.switchShopTab('pants', this)">Pants</button>
+      <button class="tab-btn" data-tab="shoes" onclick="UI.switchShopTab('shoes', this)">Shoes</button>
+      <button class="tab-btn" data-tab="background" onclick="UI.switchShopTab('background', this)">Background</button>
+      <button class="tab-btn" data-tab="food" onclick="UI.switchShopTab('food', this)">Food</button>
+      <button class="tab-btn" data-tab="pets" onclick="UI.switchShopTab('pets', this)">Pets</button>
+    </div>
+    <div id="shopGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <button onclick="UI.closeShop()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
   </div>
+</div>
 
-  <!-- CHAT MODAL -->
-  <div id="chatModal" class="modal">
-    <div class="absolute inset-0 bg-black/60" onclick="UI.closeChat()"></div>
-    <div class="relative glass rounded-2xl p-6 max-w-2xl w-full">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-xl font-semibold">Team chat</h2>
-        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeChat()">✕</button>
-      </div>
-      <div id="chatFeed" class="h-80 overflow-y-auto space-y-2 bg-white/5 border border-white/10 rounded-xl p-3"></div>
-      <form onsubmit="Handlers.sendChat(event)" class="mt-3 flex gap-2">
-        <input id="chatInput" class="flex-1 bg-white/10 border border-white/20 rounded-xl p-2" placeholder="Write a message…" />
-        <button class="btn-grad rounded-xl px-4">Send</button>
-      </form>
+<!-- MOOD MODAL -->
+<div id="moodModal" class="modal">
+  <div class="absolute inset-0 bg-black/60" onclick="UI.closeMood()"></div>
+  <div class="relative glass rounded-2xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-semibold">How are you feeling?</h2>
+      <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMood()">✕</button>
+    </div>
+    <div class="grid grid-cols-5 gap-3">
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(2)">😕<div class="text-xs mt-1">2</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(3)">🙂<div class="text-xs mt-1">3</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(4)">😄<div class="text-xs mt-1">4</div></button>
+      <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(5)">🤩<div class="text-xs mt-1">5</div></button>
     </div>
   </div>
+</div>
 
-  <!-- Scripts (config first, then app) -->
-  <script src="assets-config.js"></script>
-  <script src="app.js"></script>
+<!-- REP REPORT MODAL -->
+<div id="reportModal" class="modal">
+  <div class="absolute inset-0 bg-black/60" onclick="UI.closeReport()"></div>
+  <div class="relative glass rounded-2xl p-6 max-w-xl w-full">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-semibold">Your Rep Report</h2>
+      <button id="reportSkip" class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeReport()">Skip</button>
+    </div>
+    <form onsubmit="Handlers.submitReport(event)" class="space-y-3">
+      <label class="block text-sm">Mood (1–5)</label>
+      <input id="reportMood" type="number" min="1" max="5" value="3" class="w-full bg-white/10 border border-white/20 rounded-xl p-2">
+      <label class="block text-sm">Why are you feeling that way?</label>
+      <textarea id="reportWhy" rows="2" class="w-full bg-white/10 border border-white/20 rounded-xl p-2" placeholder="What impacted your day?"></textarea>
+      <label class="block text-sm">What questions do you have?</label>
+      <textarea id="reportQuestions" rows="2" class="w-full bg-white/10 border border-white/20 rounded-xl p-2" placeholder="Anything blocking you?"></textarea>
+      <label class="block text-sm">What do you want more coaching on?</label>
+      <textarea id="reportCoach" rows="2" class="w-full bg-white/10 border border-white/20 rounded-xl p-2" placeholder="Topics or skills to deepen"></textarea>
+      <button class="w-full btn-grad rounded-xl py-2 font-semibold hover:brightness-110 transition">Submit & earn +5</button>
+    </form>
+  </div>
+</div>
+
+<!-- TOUR MODAL -->
+<div id="tourModal" class="modal">
+  <div class="absolute inset-0 bg-black/60" onclick="UI.closeTour()"></div>
+  <div class="relative glass rounded-2xl p-6 max-w-md w-full">
+    <div class="flex items-center justify-between mb-2">
+      <h2 id="tourTitle" class="text-xl font-semibold">Welcome!</h2>
+      <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeTour()">✕</button>
+    </div>
+    <div id="tourDesc" class="text-sm text-white/80 mb-4">Quick tour text…</div>
+    <div class="flex justify-between">
+      <button id="tourPrev" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded" onclick="Handlers.tourPrev()">Back</button>
+      <button id="tourNext" class="btn-grad px-3 py-1.5 rounded" onclick="Handlers.tourNext()">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="assets-config.js?v=1"></script>
+<script src="app.js?v=1"></script>
 </body>
 </html>
