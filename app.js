@@ -1,6 +1,6 @@
-// app.js (plain JS)
+// app.js
 
-const STORAGE_KEY="llamalog_state_v10";
+const STORAGE_KEY="llamalog_state_v11";
 const DEMO_BUILD_MS=15000, IDLE_MS=20000;
 const profanity=["fuck","shit","bitch","asshole","dick","cunt","bastard","slut","whore","fag","retard","twat","prick","wank","bollock"];
 const uid=(n=10)=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return Array.from(crypto.getRandomValues(new Uint8Array(n)),b=>c[b%c.length]).join("")};
@@ -49,7 +49,6 @@ function ensureMember(team,email){
       personality:{favoriteFood:fav,dislikedFood:dis},
       lastReads:{chat:0},stats:{progressClicks:[]},
       pets:[],activePet:null,flags:{},
-      // per-rep town
       town:{owned:[],unlocked:[],active:null,lastActive:Date.now()},
       reports:{}
     };
@@ -119,7 +118,9 @@ function updateBadges(){
 
 // Renders
 function renderTownPanel(team,member){
-  const wrap=$("#townPanel"); if(!wrap) return;
+  const wrap = member ? $("#townPanelRep") : $("#townPanelMgr");
+  if(!wrap) return;
+
   if(member){
     const a=member.town.active,prog=a?Math.min(100,Math.round(100*a.activeMs/a.durationMs)):0;
     wrap.innerHTML=`<h2 class="text-xl font-semibold mb-2">Your Town</h2>
@@ -148,7 +149,6 @@ function renderTownPanel(team,member){
       g.appendChild(div);
     });
   }else{
-    // Manager summary (cleaned layout)
     const ownedCounts={}; Object.values(team.members).forEach(m=>m.town?.owned?.forEach(k=>ownedCounts[k]=(ownedCounts[k]||0)+1));
     wrap.innerHTML=`<h2 class="text-xl font-semibold mb-2">Team Town (read-only)</h2>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -202,6 +202,18 @@ function renderGiftingSelectors(t,m){
   const r=$("#repGiftRecipient"); if(r){ r.innerHTML=""; Object.values(t.members).forEach(x=>{ if(x.email===m.email) return; const o=document.createElement("option"); o.value=x.email;o.textContent=x.firstName||x.email;r.appendChild(o)})}
   const it=$("#repGiftItem"); if(it){ it.innerHTML=""; Object.entries(m.inventory).forEach(([k,q])=>{ if(q>0){ const o=document.createElement("option"); o.value=k;o.textContent=`${CATALOG.food[k].emoji} ${CATALOG.food[k].label} (You have ${q})`; it.appendChild(o)}})}
 }
+function renderGiftInbox(m){
+  const box=$("#giftInbox"); if(!box) return;
+  box.innerHTML="";
+  (m.giftsInbox||[]).slice(-20).reverse().forEach(g=>{
+    const div=document.createElement("div");
+    const item=CATALOG.food[g.itemKey];
+    div.className="bg-white/5 border border-white/10 rounded-xl p-2 flex items-center justify-between";
+    div.innerHTML=`<div class="text-sm">${item.emoji} ${item.label} from ${g.fromName||g.from}</div>
+      <button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1 rounded text-sm" onclick="Handlers.claimGift('${g.id}')">Claim</button>`;
+    box.appendChild(div);
+  });
+}
 
 function applyBackground(m){
   const b=CATALOG.background.find(x=>x.key===m.equipped.background)||CATALOG.background[0];
@@ -228,7 +240,7 @@ window.Screens={
   renderManager(){
     const s=load(),t=s.teams[session.teamCode]; if(!t) return UI.show("landingPage");
     $("#teamInfo").textContent=`Team ${t.teamName} • Code ${session.teamCode} • Manager ${t.managerEmail}`;
-    // Pending approvals
+
     const list=$("#approvalsList"); list.innerHTML="";
     (t.pending||[]).forEach((p,i)=>{
       const row=document.createElement("div");
@@ -267,7 +279,6 @@ window.Screens={
         </form>`;
     }
 
-    // Reports summary
     const repList=$("#reportsList"); repList.innerHTML="";
     (t.reports||[]).slice(-10).reverse().forEach(r=>{
       const d=document.createElement("div"); d.className="bg-white/5 border border-white/10 rounded-xl p-3";
@@ -298,10 +309,11 @@ window.Screens={
     renderActivities(t,m);
     $("#coinsLabel").textContent=`Coins: ${m.coins}`;
     renderGiftingSelectors(t,m);
+    renderGiftInbox(m);
     renderTownPanel(t,m);
     updateBadges();
 
-    // Auto-open today's Rep Report if not submitted
+    // Auto-open Rep Report if not submitted today
     const dk=today(); if(!m.reports[dk]) UI.openReport(true);
   },
 
@@ -354,7 +366,7 @@ window.Screens={
   }
 };
 
-// UI helpers (centered modals + body lock)
+// UI
 window.UI={
   show(id){$$("section").forEach(s=>s.classList.add("hidden"));$("#"+id)?.classList.remove("hidden");if(id==="managerDashboard")Screens.renderManager();if(id==="repDashboard")Screens.renderRep()},
   openShop(){window.scrollTo({top:0,behavior:"smooth"});document.body.classList.add("modal-open");$("#shopModal").classList.add("show");Screens.renderShop(window.currentShopTab||"hats")},
@@ -416,7 +428,7 @@ window.Handlers={
     m.llama.happiness=Math.min(100,m.llama.happiness+happy);
     addXP(m,3); m.coins+=1; save(s); Toast(`Fed ${f.label}`,"success"); Screens.renderRep()},
 
-  // Activities logging (with gentle anti-spam)
+  // Activities logging
   adjustProgress(i,delta){
     const s=load(),t=s.teams[session.teamCode],m=t.members[session.email];const d=today(),a=t.activities[i];if(!a?.target)return;
     const now=Date.now(); m.stats.progressClicks=(m.stats.progressClicks||[]).filter(ts=>now-ts<20000);
@@ -425,7 +437,6 @@ window.Handlers={
     m.stats.progressClicks.push(now);
     const slot=m.progress[d]?.[i]||(m.progress[d][i]={count:0});
     const before=slot.count||0; slot.count=Math.max(0,before+delta);
-    // hunger nudge
     m.llama.hunger=Math.max(0,m.llama.hunger-2);
     if(before<a.target && slot.count>=a.target){ m.coins+=5; m.llama.happiness=Math.min(100,m.llama.happiness+5); addXP(m,4); this.checkPath(t,m) }
     save(s); Screens.renderRep();
@@ -441,12 +452,12 @@ window.Handlers={
     if(all){ let bonus=8; if(m.activePet==="mini_alpaca") bonus+=1; m.coins+=bonus; addXP(m,6); Toast("Path complete! +coins","success"); if(gate(m,"perk:celebration")) confetti(80) }
   },
 
-  // Chat + gifting (gated by Networking Center)
+  // Chat + gifting
   sendChat(e){e.preventDefault();const input=$("#chatInput");const text=input.value.trim();if(!text)return;const s=load(),t=s.teams[session.teamCode];const me=t.members[session.email]||{firstName:session.email};if(!gate(me,"chat"))return Toast("Build Networking Center to unlock chat","warn");t.chat.push({from:session.email,name:me.firstName||session.email,text,at:Date.now()});save(s);input.value="";Screens.renderChat();updateBadges()},
   repGift(e){e.preventDefault();const s=load(),t=s.teams[session.teamCode],m=t.members[session.email];if(!gate(m,"gifting"))return Toast("Build Networking Center to unlock gifting","warn");const rec=$("#repGiftRecipient").value,item=$("#repGiftItem").value;if((m.inventory[item]||0)<=0)return Toast("You do not have this item","error");m.inventory[item]-=1;t.members[rec].giftsInbox.push({id:uid(8),from:session.email,fromName:m.firstName,itemKey:item,at:Date.now()});save(s);Toast("Gift sent","success");Screens.renderRep()},
   claimGift(id){const s=load(),t=s.teams[session.teamCode],m=t.members[session.email];const i=m.giftsInbox.findIndex(g=>g.id===id);if(i<0)return;const g=m.giftsInbox[i];m.inventory[g.itemKey]=(m.inventory[g.itemKey]||0)+1;m.giftsInbox.splice(i,1);save(s);Toast("Gift claimed","success");Screens.renderRep()},
 
-  // Buildings (REPS can build)
+  // Buildings (REPs build)
   startBuild(key){
     const s=load(),t=s.teams[session.teamCode],m=t.members[session.email];
     const b=BUILDINGS.find(x=>x.key===key); if(!b||!m) return;
