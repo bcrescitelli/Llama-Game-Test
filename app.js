@@ -1,4 +1,4 @@
-<script>
+
 /* ========= Core utilities / storage ========= */
 const STORAGE_KEY = "llamalog_state_v7";
 const profanityList = ["fuck","shit","bitch","asshole","dick","cunt","bastard","slut","whore","fag","retard","twat","prick","wank","bollock"];
@@ -455,4 +455,4 @@ window.UI.show("landingPage");
   const t=s.teams[code]; const m1=ensureMember(t,"alex@example.com"); m1.firstName="Alex"; m1.coins=50; const m2=ensureMember(t,"casey@example.com"); m2.firstName="Casey";
   save(s);
 })();
-</script>
+
