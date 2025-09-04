@@ -20,7 +20,6 @@
     .grad-bg { background: linear-gradient(135deg,#1e1b4b, #0f172a 55%, #0b1229) }
     .btn-grad { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
     .btn-grad-2 { background: linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%) }
-    .inventory-tab.active, .shop-tab.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
     .notification-badge { animation: pulse 2s infinite }
     @keyframes pulse {0%,100%{opacity:1} 50%{opacity:.5}}
     /* Toasts */
@@ -35,7 +34,7 @@
     .mood-energized { background: linear-gradient(135deg, #8b5cf6, #06b6d4 60%) }
     .icon-btn { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: .75rem }
     /* Llama canvas layering */
-    .llama-canvas { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+    .llama-canvas { position: relative; width: 340px; height: 340px; margin: 0 auto; border-radius: 1rem; overflow: hidden; }
     .llama-layer { position: absolute; inset: 0; object-fit: contain; transform-origin: center; pointer-events: none; }
     /* Shop tabs */
     .tab-btn { padding:.5rem .75rem; border-radius:.75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
@@ -43,8 +42,8 @@
     /* Modal shell */
     .modal { position: fixed; inset: 0; z-index: 999; display: none; align-items: center; justify-content: center; padding:1rem; }
     .modal.show { display: flex; }
-    /* Emoji mood buttons */
-    .mood-emoji { font-size: 28px; line-height: 1; }
+    /* Badge styles */
+    .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .55rem; border-radius:.75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
   </style>
 </head>
 
@@ -161,10 +160,11 @@
             <p class="text-white/80" id="teamInfo">Team: Loading...</p>
           </div>
           <div class="flex items-center gap-3">
-            <button id="pendingBell" onclick="UI.show('managerApprovals')" class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
+            <button id="pendingBell" onclick="UI.show('managerDashboard')" class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
               <span>🔔</span>
               <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded notification-badge">0</span>
             </button>
+            <button onclick="UI.openChat()" class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Team chat</button>
             <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
@@ -184,15 +184,15 @@
         <!-- Custom Activities (4) -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-2">Daily focus activities (4)</h2>
-            <span class="text-white/60 text-sm">Tip: “Log 3 calls” auto-detects the 3</span>
+            <h2 class="text-xl font-semibold mb-2">Daily focus (Duolingo-style path)</h2>
+            <span class="text-white/60 text-sm">“Log 3 calls” auto-detects the 3</span>
           </div>
           <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
             <input id="act1" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 1">
             <input id="act2" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 2">
             <input id="act3" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 3">
             <input id="act4" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 4">
-            <button type="submit" class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save and publish to team</button>
+            <button type="submit" class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
           </form>
         </div>
 
@@ -200,7 +200,7 @@
         <div class="glass rounded-2xl p-6 lg:col-span-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold mb-2">Team mood this week</h2>
-            <span class="text-white/60 text-sm">Average of daily emoji check-ins</span>
+            <span class="text-white/60 text-sm">Average of emoji check-ins</span>
           </div>
           <div id="moodChart" class="w-full overflow-x-auto"></div>
         </div>
@@ -236,30 +236,30 @@
             <div>
               <h1 class="text-2xl font-bold">Welcome back, <span id="repFirstNameLabel">Rep</span></h1>
               <p class="text-white/80 text-sm">Team <span id="repTeamNameLabel"></span></p>
+              <div class="text-xs text-white/70" id="streakLabel">Streak: 0</div>
             </div>
           </div>
           <div class="flex items-center gap-3">
             <button onclick="UI.openMoodModal()" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600">Daily mood</button>
             <button onclick="UI.openShop()" class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Open shop</button>
+            <button onclick="UI.openChat()" class="px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600">Team chat</button>
             <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
       </div>
 
-      <!-- Llama care and preview -->
+      <!-- Llama + path -->
       <div class="grid lg:grid-cols-3 gap-6">
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Your llama</h2>
 
-          <div class="llama-canvas">
-            <!-- Base character -->
+          <div id="llamaCanvas" class="llama-canvas">
+            <!-- Background (CSS) is applied to this container -->
             <img id="llama-base" class="llama-layer" alt="llama" src="">
-            <!-- Layered items -->
             <img id="layer-hat" class="llama-layer" alt="">
             <img id="layer-neck" class="llama-layer" alt="">
             <img id="layer-pants" class="llama-layer" alt="">
             <img id="layer-shoes" class="llama-layer" alt="">
-            <!-- Multiple accessories -->
             <div id="layer-accessories" class="llama-layer" style="position:absolute; inset:0;"></div>
           </div>
 
@@ -284,22 +284,23 @@
               </div>
             </div>
 
-            <!-- Food quick actions -->
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Feed Hay</button>
+              <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
               <button onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
               <button onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
             </div>
           </div>
         </div>
 
-        <!-- Daily Activities -->
+        <!-- Duolingo-style path + Activities -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-1">Today’s focus</h2>
-            <span class="text-sm text-white/60">Complete tasks to earn coins and happiness</span>
+            <h2 class="text-xl font-semibold mb-1">Today’s path</h2>
+            <span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span>
           </div>
-          <div id="activitiesList" class="mt-3 space-y-3"></div>
+
+          <div id="pathNodes" class="flex flex-wrap gap-3 mt-2"></div>
+          <div id="activitiesList" class="mt-4 space-y-3"></div>
         </div>
 
         <!-- Team Social -->
@@ -327,8 +328,8 @@
 
         <!-- Achievements -->
         <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Achievements</h2>
-          <ul id="achievementsList" class="space-y-1 text-sm"></ul>
+          <h2 class="text-xl font-semibold mb-3">Badges</h2>
+          <div id="badgesGrid" class="grid grid-cols-2 gap-2"></div>
         </div>
       </div>
     </div>
@@ -337,18 +338,22 @@
   <!-- SHOP MODAL -->
   <div id="shopModal" class="modal">
     <div class="absolute inset-0 bg-black/60" onclick="UI.closeShop()"></div>
-    <div class="relative glass rounded-2xl p-6 max-w-3xl w-full">
+    <div class="relative glass rounded-2xl p-6 max-w-4xl w-full">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold">Llama Shop</h2>
-        <div class="text-sm text-white/70">Coins: <span id="shopCoins">0</span> • XP: <span id="shopXP">0</span></div>
+        <div class="flex items-center gap-2">
+          <div class="text-sm text-white/70">Coins: <span id="shopCoins">0</span> • XP: <span id="shopXP">0</span></div>
+          <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeShop()">✕</button>
+        </div>
       </div>
 
       <div class="flex flex-wrap gap-2 mb-4">
         <button class="tab-btn active" data-tab="hats" onclick="UI.switchShopTab('hats', this)">Hats</button>
         <button class="tab-btn" data-tab="neckwear" onclick="UI.switchShopTab('neckwear', this)">Neckwear</button>
+        <button class="tab-btn" data-tab="accessories" onclick="UI.switchShopTab('accessories', this)">Accessories</button>
         <button class="tab-btn" data-tab="pants" onclick="UI.switchShopTab('pants', this)">Pants</button>
         <button class="tab-btn" data-tab="shoes" onclick="UI.switchShopTab('shoes', this)">Shoes</button>
-        <button class="tab-btn" data-tab="accessories" onclick="UI.switchShopTab('accessories', this)">Accessories</button>
+        <button class="tab-btn" data-tab="background" onclick="UI.switchShopTab('background', this)">Background</button>
         <button class="tab-btn" data-tab="food" onclick="UI.switchShopTab('food', this)">Food</button>
       </div>
 
@@ -362,7 +367,10 @@
   <div id="moodModal" class="modal">
     <div class="absolute inset-0 bg-black/60" onclick="UI.closeMoodModal()"></div>
     <div class="relative glass rounded-2xl p-6 max-w-md w-full">
-      <h2 class="text-xl font-semibold mb-3">How are you feeling today?</h2>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-semibold">How are you feeling?</h2>
+        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMoodModal()">✕</button>
+      </div>
       <div class="grid grid-cols-5 gap-3">
         <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
         <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(2)">😕<div class="text-xs mt-1">2</div></button>
@@ -370,45 +378,62 @@
         <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(4)">😄<div class="text-xs mt-1">4</div></button>
         <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(5)">🤩<div class="text-xs mt-1">5</div></button>
       </div>
-      <button onclick="UI.closeMoodModal()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
+    </div>
+  </div>
+
+  <!-- CHAT MODAL -->
+  <div id="chatModal" class="modal">
+    <div class="absolute inset-0 bg-black/60" onclick="UI.closeChat()"></div>
+    <div class="relative glass rounded-2xl p-6 max-w-2xl w-full">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Team chat</h2>
+        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeChat()">✕</button>
+      </div>
+      <div id="chatFeed" class="h-80 overflow-y-auto space-y-2 bg-white/5 border border-white/10 rounded-xl p-3"></div>
+      <form onsubmit="Handlers.sendChat(event)" class="mt-3 flex gap-2">
+        <input id="chatInput" class="flex-1 bg-white/10 border border-white/20 rounded-xl p-2" placeholder="Write a message…" />
+        <button class="btn-grad rounded-xl px-4">Send</button>
+      </form>
     </div>
   </div>
 
   <!-- App Script -->
   <script>
     /********************
-     * IMAGE CATALOG
-     * NOTE: If a link doesn't render, replace it with the direct image URL (.png/.jpg)
+     * IMAGE CATALOG (your Imgur links)
      ********************/
     const CATALOG = {
-      llamaBase: "https://postimg.cc/kRG7T3c3", // base llama image
-      // clothing & accessories (use TN for thumbnails, image for layer)
+      llamaBase: "https://i.imgur.com/zgQ8490.png",
       hats: [
-        { key:"cool_hat", name:"Cool Hat", thumb:"https://postimg.cc/q6Nd8cJp", image:"https://postimg.cc/dkHYkNKW", cost:{coins:20}, slot:"hat", offset:{x:0,y:-95,scale:1.0,rotate:0} },
-        { key:"silly_hat", name:"Silly Hat", thumb:"https://postimg.cc/gnyggXxp", image:"https://postimg.cc/wRLw83Fh", cost:{coins:14}, slot:"hat", offset:{x:0,y:-95,scale:1.0,rotate:0} },
+        { key:"cool_hat", name:"Cool Hat", thumb:"https://i.imgur.com/r6L0Yg1.png", image:"https://i.imgur.com/r6L0Yg1.png", cost:{coins:20}, slot:"hat", offset:{x:0,y:-100,scale:1.0,rotate:0} },
+        { key:"silly_hat", name:"Silly Hat", thumb:"https://i.imgur.com/1uG1sJh.png", image:"https://i.imgur.com/tWUl2Iz.png", cost:{coins:14}, slot:"hat", offset:{x:0,y:-100,scale:1.0,rotate:0} },
       ],
       neckwear: [
-        { key:"cool_neck", name:"Cool Necktie", thumb:"https://postimg.cc/7bhD84gj", image:"https://postimg.cc/Q9xDMGv9", cost:{coins:12}, slot:"neck", offset:{x:0,y:20,scale:1.0,rotate:0} },
-        { key:"silly_neck", name:"Silly Neckwear", thumb:"https://postimg.cc/RNxP1QVG", image:"https://postimg.cc/gnyggXxp", cost:{coins:10}, slot:"neck", offset:{x:0,y:20,scale:1.0,rotate:0} },
+        { key:"cool_neck", name:"Cool Necktie", thumb:"https://i.imgur.com/BfDS7mI.png", image:"https://i.imgur.com/X4wSwdR.png", cost:{coins:12}, slot:"neck", offset:{x:0,y:18,scale:1.0,rotate:0} },
+        { key:"silly_neck", name:"Silly Neck Accessory", thumb:"https://i.imgur.com/rRoOY9E.png", image:"https://i.imgur.com/wYOH3ah.png", cost:{coins:10}, slot:"neck", offset:{x:0,y:18,scale:1.0,rotate:0} },
       ],
       pants: [
-        { key:"cool_pants", name:"Cool Pants", thumb:"https://postimg.cc/TpW61cN9", image:"https://postimg.cc/Z95sBbKS", cost:{coins:18}, slot:"pants", offset:{x:0,y:70,scale:1.0,rotate:0} },
-        { key:"silly_pants", name:"Silly Pants", thumb:"https://postimg.cc/p9rkVsqV", image:"https://postimg.cc/4YBBTDvF", cost:{coins:15}, slot:"pants", offset:{x:0,y:70,scale:1.0,rotate:0} },
+        { key:"cool_pants", name:"Cool Pants", thumb:"https://i.imgur.com/lzPAKyL.png", image:"https://i.imgur.com/O2sMwsc.png", cost:{coins:18}, slot:"pants", offset:{x:0,y:75,scale:1.0,rotate:0} },
+        { key:"silly_pants", name:"Silly Pants", thumb:"https://i.imgur.com/A6gfUej.png", image:"https://i.imgur.com/1z0ZDVZ.png", cost:{coins:15}, slot:"pants", offset:{x:0,y:75,scale:1.0,rotate:0} },
       ],
       shoes: [
-        { key:"cool_shoes", name:"Cool Shoes", thumb:"https://postimg.cc/Bj9GK1dG", image:"https://postimg.cc/Z0QmJQHnC", cost:{coins:14}, slot:"shoes", offset:{x:0,y:115,scale:1.0,rotate:0} },
-        { key:"silly_shoes", name:"Silly Shoes", thumb:"https://postimg.cc/VrbRn5x3", image:"https://postimg.cc/GBfK4v5F", cost:{coins:12}, slot:"shoes", offset:{x:0,y:115,scale:1.0,rotate:0} },
+        { key:"cool_shoes", name:"Cool Shoes", thumb:"https://i.imgur.com/YrmbXe9.png", image:"https://i.imgur.com/90C8TNe.png", cost:{coins:14}, slot:"shoes", offset:{x:0,y:120,scale:1.0,rotate:0} },
+        { key:"silly_shoes", name:"Silly Shoes", thumb:"https://i.imgur.com/K0GUBle.png", image:"https://i.imgur.com/xooykYg.png", cost:{coins:12}, slot:"shoes", offset:{x:0,y:120,scale:1.0,rotate:0} },
       ],
       accessories: [
-        { key:"sunglasses", name:"Sunglasses", thumb:"https://postimg.cc/d7JPWcsH", image:"https://postimg.cc/NK6v7jc2", cost:{coins:10}, slot:"accessory", offset:{x:0,y:-10,scale:1.0,rotate:0} },
-        { key:"clown_nose", name:"Clown Nose", thumb:"https://postimg.cc/w3mfsbH7", image:"https://postimg.cc/BLdmV25S", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-5,scale:1.0,rotate:0} },
-        { key:"cell_phone", name:"Cell Phone", thumb:"https://postimg.cc/kBCcRJfp", image:"https://postimg.cc/9rBBG6kF", cost:{coins:10}, slot:"accessory", offset:{x:40,y:40,scale:1.0,rotate:0} },
-        { key:"iced_coffee", name:"Iced Coffee", thumb:"https://postimg.cc/ZW7FQrZG", image:"https://postimg.cc/qNMxQmfc", cost:{coins:10}, slot:"accessory", offset:{x:-40,y:45,scale:1.0,rotate:0} },
-        { key:"tote_bag", name:"Tote Bag", thumb:"https://postimg.cc/bdx0PXpH", image:"https://postimg.cc/7JnSnzmQ", cost:{coins:10}, slot:"accessory", offset:{x:-10,y:50,scale:1.0,rotate:0} },
-        { key:"protein_shaker", name:"Protein Shaker", thumb:"https://postimg.cc/N2c1XD7H", image:"https://postimg.cc/qhnsgSnr", cost:{coins:8}, slot:"accessory", offset:{x:30,y:55,scale:1.0,rotate:0} },
-        { key:"mustache", name:"Mustache", thumb:"https://postimg.cc/1g8c1f3f", image:"https://postimg.cc/JyS3rMsK", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-2,scale:1.0,rotate:0} },
+        { key:"sunglasses", name:"Sunglasses", thumb:"https://i.imgur.com/3PCFnWc.png", image:"https://i.imgur.com/UZ6jX96.png", cost:{coins:10}, slot:"accessory", offset:{x:0,y:-12,scale:1.0,rotate:0} },
+        { key:"cell_phone", name:"Cellphone", thumb:"https://i.imgur.com/QLyFZPb.png", image:"https://i.imgur.com/zvjSDcX.png", cost:{coins:10}, slot:"accessory", offset:{x:40,y:40,scale:1.0,rotate:0} },
+        { key:"iced_coffee", name:"Iced Coffee", thumb:"https://i.imgur.com/gzk37Mh.png", image:"https://i.imgur.com/EbJ63wc.png", cost:{coins:10}, slot:"accessory", offset:{x:-40,y:45,scale:1.0,rotate:0} },
+        { key:"tote_bag", name:"Tote Bag", thumb:"https://i.imgur.com/xGRXCEX.png", image:"https://i.imgur.com/yE5XauC.png", cost:{coins:10}, slot:"accessory", offset:{x:-10,y:50,scale:1.0,rotate:0} },
+        { key:"protein_shaker", name:"Protein Shaker", thumb:"https://i.imgur.com/DH1H5c1.png", image:"https://i.imgur.com/dqSy2Ji.png", cost:{coins:8}, slot:"accessory", offset:{x:30,y:55,scale:1.0,rotate:0} },
+        { key:"mustache", name:"Mustache", thumb:"https://i.imgur.com/f2RKF47.png", image:"https://i.imgur.com/kngbJ8M.png", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-2,scale:1.0,rotate:0} },
       ],
-      // Food (emoji thumbnails in UI; consumables)
+      background: [
+        { key:"bg_meadow", name:"Meadow", thumbCSS:"linear-gradient(135deg,#86efac,#60a5fa)", bgCSS:"linear-gradient(135deg,#a7f3d0,#60a5fa)" },
+        { key:"bg_office", name:"Office", thumbCSS:"linear-gradient(135deg,#cbd5e1,#94a3b8)", bgCSS:"linear-gradient(135deg,#e5e7eb,#94a3b8)" },
+        { key:"bg_night", name:"Night Sky", thumbCSS:"linear-gradient(135deg,#0ea5e9,#111827)", bgCSS:"linear-gradient(135deg,#0ea5e9,#111827)" },
+      ],
+      // Food (emoji thumbnails; consumables)
       food: {
         hay:     { label: "Hay", emoji: "🌾", hunger: 20, happiness: 2, cost: 5 },
         carrot:  { label: "Carrot", emoji: "🥕", hunger: 15, happiness: 5, cost: 8 },
@@ -419,7 +444,7 @@
     /***************
      * State model *
      ***************/
-    const STORAGE_KEY = "llamalog_state_v3";
+    const STORAGE_KEY = "llamalog_state_v5";
     const profanityList = ["fuck","shit","bitch","asshole","dick","cunt","bastard","slut","whore","fag","nigger","retard","twat","prick","wank","bollock"];
 
     function loadState() {
@@ -448,37 +473,42 @@
       toast(msg, type = "info") {
         const container = document.getElementById("toastContainer");
         const card = document.createElement("div");
-        const base = "toast-enter glass rounded-xl px-4 py-3 text-sm";
+        const base = "toast-enter glass rounded-xl px-4 py-3 text-sm flex items-start gap-3";
         const color = type === "success" ? "border-emerald-400"
                     : type === "error" ? "border-rose-400"
                     : type === "warn" ? "border-amber-400"
                     : "border-white/20";
         card.className = `${base} ${color}`;
-        card.textContent = msg;
+        card.innerHTML = `<div class="flex-1">${msg}</div><button class="bg-white/10 hover:bg-white/20 px-2 rounded" aria-label="Dismiss">✕</button>`;
+        card.querySelector("button").onclick = () => card.remove();
         container.appendChild(card);
         requestAnimationFrame(() => card.classList.replace("toast-enter","toast-enter-active"));
         setTimeout(() => {
+          if (!card.isConnected) return;
           card.classList.add("toast-leave");
           card.classList.replace("toast-enter-active","toast-leave-active");
           setTimeout(() => card.remove(), 250);
-        }, 2500);
+        }, 3500);
       },
       format(name, max=24){ if(!name) return ""; return name.length>max ? name.slice(0,max-1)+"…" : name; },
-
-      openShop(){
-        document.getElementById("shopModal").classList.add("show");
-        Screens.renderShop("hats");
-      },
+      openShop(){ document.getElementById("shopModal").classList.add("show"); Screens.renderShop("hats"); },
       closeShop(){ document.getElementById("shopModal").classList.remove("show"); },
       switchShopTab(tab, btn){
         document.querySelectorAll("#shopModal .tab-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
         Screens.renderShop(tab);
       },
-
       openMoodModal(){ document.getElementById("moodModal").classList.add("show"); },
-      closeMoodModal(){ document.getElementById("moodModal").classList.remove("show"); }
+      closeMoodModal(){ document.getElementById("moodModal").classList.remove("show"); },
+      openChat(){ document.getElementById("chatModal").classList.add("show"); Screens.renderChat(); },
+      closeChat(){ document.getElementById("chatModal").classList.remove("show"); }
     };
+    // Esc key closes modals
+    document.addEventListener("keydown", (e)=> {
+      if (e.key === "Escape") {
+        UI.closeShop(); UI.closeMoodModal(); UI.closeChat();
+      }
+    });
 
     /*****************
      * Auth session  *
@@ -494,9 +524,10 @@
           teamName: "",
           managerEmail: "",
           createdAt: Date.now(),
-          activities: [],   // [{ label, target? }]
-          pending: [],      // [{ email, firstName, requestedAt }]
-          members: {}       // email -> member
+          activities: [],
+          pending: [],
+          members: {},
+          chat: [] // [{from, name, text, at}]
         };
         return state.teams[code];
       },
@@ -510,6 +541,12 @@
       },
       ensureMember(team, email) {
         if (!team.members[email]) {
+          // Random personality
+          const foods = Object.keys(CATALOG.food);
+          const fav = foods[Math.floor(Math.random()*foods.length)];
+          let dis = foods[Math.floor(Math.random()*foods.length)];
+          if (dis===fav) dis = foods[(foods.indexOf(dis)+1)%foods.length];
+
           team.members[email] = {
             firstName: "",
             email,
@@ -523,14 +560,22 @@
               lastTick: Date.now(),
               fedStreak: 0
             },
-            // cosmetic + consumables
-            owned: {},            // key -> true (cosmetics)
-            equipped: { hat:null, neck:null, pants:null, shoes:null, accessories: [] },
-            inventory: { hay: 1, carrot: 1, espresso: 0 }, // food counts
-            giftsInbox: [],       // [{id, from, fromName, itemKey, at}]
-            achievements: { wellFedStreak: 0, giftGiver: 0, productStreak: 0 },
-            progress: {},         // date -> { [actIndex]: { count or done } }
-            checkins: {}          // date -> { mood }
+            owned: {},
+            equipped: { hat:null, neck:null, pants:null, shoes:null, accessories: [], background: "bg_meadow" },
+            inventory: { hay: 1, carrot: 1, espresso: 0 },
+            giftsInbox: [],
+            achievements: {
+              // progress counters
+              wellFedStreak: 0, giftGiver: 0, productStreak: 0,
+              // badges unlocked: key -> timestamp
+              badges: {}
+            },
+            progress: {},
+            checkins: {},
+            // streaks
+            streak: { count: 0, lastDay: null },
+            // personality
+            personality: { favoriteFood: fav, dislikedFood: dis }
           };
         }
         return team.members[email];
@@ -556,12 +601,76 @@
         const f = CATALOG.food[key]; if (!f) return false;
         if ((member.inventory[key]||0) <= 0) return false;
         member.inventory[key] -= 1;
+
+        // Personality effects
+        let happinessBoost = f.happiness;
+        if (key === member.personality.favoriteFood) happinessBoost += 2;
+        if (key === member.personality.dislikedFood) happinessBoost = Math.max(0, happinessBoost - 2);
+
         member.llama.hunger = Math.min(100, member.llama.hunger + f.hunger);
-        member.llama.happiness = Math.min(100, member.llama.happiness + f.happiness);
+        member.llama.happiness = Math.min(100, member.llama.happiness + happinessBoost);
         member.llama.fedStreak = Math.min(365, (member.llama.fedStreak || 0) + 1);
         member.achievements.wellFedStreak = Math.max(member.achievements.wellFedStreak || 0, member.llama.fedStreak);
         Domain.addXP(member, 3);
         return true;
+      },
+      // Streak update each day user visits
+      updateStreak(member){
+        const today = todayKey();
+        if (member.streak.lastDay === today) return;
+        const prev = member.streak.lastDay;
+        const yest = new Date(); yest.setDate(yest.getDate()-1);
+        const yKey = yest.toISOString().slice(0,10);
+        if (!prev || prev !== yKey) member.streak.count = 1;
+        else member.streak.count += 1;
+        member.streak.lastDay = today;
+        // Rewards
+        member.coins += 2; // daily login reward
+        if (member.streak.count % 7 === 0) {
+          member.coins += 10;
+          UI.toast("Weekly streak bonus! +10 coins", "success");
+          Badges.unlock(member, "streak_7");
+        }
+        if (member.streak.count === 3) Badges.unlock(member, "streak_3");
+        if (member.streak.count === 14) Badges.unlock(member, "streak_14");
+      }
+    };
+
+    /*****************
+     * Badges system *
+     *****************/
+    const Badges = {
+      defs: {
+        streak_3:   { name: "Warm Up", desc: "3-day streak" },
+        streak_7:   { name: "One Week", desc: "7-day streak" },
+        streak_14:  { name: "Two Weeks", desc: "14-day streak" },
+        path_master:{ name: "Path Master", desc: "Completed today’s path" },
+        giver_5:    { name: "Gift Giver", desc: "Sent 5 gifts" },
+        accessor_3: { name: "Accessorizer", desc: "Equip 3 cosmetics at once" },
+        early_bird: { name: "Early Bird", desc: "Check-in before 10am" }
+      },
+      unlock(member, key){
+        if (member.achievements.badges[key]) return;
+        member.achievements.badges[key] = Date.now();
+        UI.toast(`Badge earned: ${this.defs[key]?.name || key}`, "success");
+      },
+      render(member){
+        const grid = document.getElementById("badgesGrid");
+        grid.innerHTML = "";
+        const keys = Object.keys(this.defs);
+        keys.forEach(k=>{
+          const unlocked = !!member.achievements.badges[k];
+          const div = document.createElement("div");
+          div.className = "badge";
+          div.innerHTML = `
+            <span>${unlocked ? "🏅" : "🔒"}</span>
+            <div>
+              <div class="font-semibold">${this.defs[k].name}</div>
+              <div class="text-xs text-white/70">${this.defs[k].desc}</div>
+            </div>
+          `;
+          grid.appendChild(div);
+        });
       }
     };
 
@@ -576,19 +685,21 @@
         document.getElementById("teamInfo").textContent =
           `Team ${team.teamName} • Code ${session.teamCode} • Manager ${team.managerEmail}`;
 
-        // Pending approvals (aligned buttons)
+        // Approvals (flex, no overflow)
         const approvalsEl = document.getElementById("approvalsList");
         approvalsEl.innerHTML = "";
         (team.pending || []).forEach((p, idx) => {
           const row = document.createElement("div");
-          row.className = "grid grid-cols-5 items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3";
+          row.className = "flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3 gap-3 flex-wrap";
           row.innerHTML = `
-            <div class="col-span-3">
+            <div class="flex-1 min-w-[220px]">
               <div class="font-medium">${UI.format(p.firstName)} <span class="text-white/60">(${UI.format(p.email)})</span></div>
               <div class="text-xs text-white/60">Requested ${new Date(p.requestedAt).toLocaleString()}</div>
             </div>
-            <button class="col-span-1 bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded text-center" onclick="Handlers.approve(${idx})">Approve</button>
-            <button class="col-span-1 bg-rose-500 hover:bg-rose-600 px-3 py-2 rounded text-center" onclick="Handlers.reject(${idx})">Reject</button>
+            <div class="flex gap-2">
+              <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded" onclick="Handlers.approve(${idx})">Approve</button>
+              <button class="bg-rose-500 hover:bg-rose-600 px-3 py-2 rounded" onclick="Handlers.reject(${idx})">Reject</button>
+            </div>
           `;
           approvalsEl.appendChild(row);
         });
@@ -671,13 +782,16 @@
         if (!team) return UI.show("landingPage");
         const member = Domain.ensureMember(team, session.email);
         Domain.tickLlama(member);
+        // Daily streak update
+        Domain.updateStreak(member);
         saveState(state);
 
         // Header
         document.getElementById("repFirstNameLabel").textContent = member.firstName || session.email;
         document.getElementById("repTeamNameLabel").textContent = team.teamName;
+        document.getElementById("streakLabel").textContent = `Streak: ${member.streak.count}`;
 
-        // Mood background based on happiness/hunger
+        // Mood background by happiness/hunger
         const header = document.getElementById("repHeader");
         header.classList.remove("mood-happy","mood-sad","mood-angry","mood-energized");
         const h = member.llama.happiness, g = member.llama.hunger;
@@ -686,8 +800,9 @@
         else if (h < 45) header.classList.add("mood-sad");
         else header.classList.add("mood-energized");
 
-        // Llama preview (base + layers)
+        // Llama preview
         document.getElementById("llama-base").src = CATALOG.llamaBase;
+        applyBackground(member);
         applyLayer("hat", member);
         applyLayer("neck", member);
         applyLayer("pants", member);
@@ -700,6 +815,19 @@
         document.getElementById("llamaXP").textContent = member.llama.xp;
         document.getElementById("hungerBar").style.width = `${Math.round(member.llama.hunger)}%`;
         document.getElementById("happinessBar").style.width = `${Math.round(member.llama.happiness)}%`;
+
+        // PATH nodes (duo style)
+        const path = document.getElementById("pathNodes"); path.innerHTML = "";
+        (team.activities || []).slice(0,4).forEach((act,i)=>{
+          const day = todayKey();
+          const slot = member.progress[day]?.[i];
+          const complete = act.target ? (slot?.count || 0) >= act.target : !!slot?.done;
+          const node = document.createElement("div");
+          node.className = `px-3 py-2 rounded-xl border ${complete?'bg-emerald-500/20 border-emerald-400':'bg-white/5 border-white/10'}`;
+          node.innerHTML = `<div class="text-sm font-semibold">${UI.format(act.label,18)}</div>
+                            <div class="text-[10px] text-white/70">${act.target?`Target ${act.target}`:'Checkbox'}</div>`;
+          path.appendChild(node);
+        });
 
         // Activities
         const list = document.getElementById("activitiesList");
@@ -774,12 +902,8 @@
           inbox.appendChild(row);
         });
 
-        // Achievements
-        const ach = document.getElementById("achievementsList");
-        ach.innerHTML = "";
-        const A = member.achievements;
-        [["Well fed streak", A.wellFedStreak || 0],["Gift giver", A.giftGiver || 0],["Productivity streak", A.productStreak || 0]]
-          .forEach(([name,val])=>{ const li = document.createElement("li"); li.textContent = `${name}: ${val}`; ach.appendChild(li); });
+        // Badges
+        Badges.render(member);
       },
 
       renderShop(tab="hats"){
@@ -791,9 +915,13 @@
 
         const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
 
-        const addCard = (item, isFood=false)=>{
-          const owned = isFood ? (member.inventory[item.key]||0)>0 : !!member.owned[item.key];
-          const equipped = !isFood && (
+        const addCard = (item, type)=>{
+          const isFood = (type==="food");
+          const isBg = (type==="background");
+          const owned = isFood ? (member.inventory[item.key]||0)>0
+                               : isBg ? (member.equipped.background===item.key)
+                               : !!member.owned[item.key];
+          const equipped = !isFood && !isBg && (
             member.equipped.hat===item.key ||
             member.equipped.neck===item.key ||
             member.equipped.pants===item.key ||
@@ -803,19 +931,31 @@
 
           const div = document.createElement("div");
           div.className = "bg-white/5 border border-white/10 rounded-xl p-3";
+          let media = "";
+          if (isFood) {
+            media = `<div class="text-4xl">${item.emoji}</div>`;
+          } else if (isBg) {
+            media = `<div class="w-full h-full" style="background:${item.thumbCSS};"></div>`;
+          } else {
+            media = `<img src="${item.thumb}" class="w-full h-full object-contain" alt="${item.name}" onerror="this.src='${item.image}'" />`;
+          }
           div.innerHTML = `
             <div class="aspect-video bg-white/5 rounded-xl mb-2 flex items-center justify-center overflow-hidden">
-              ${isFood
-                ? `<div class="text-4xl">${item.emoji}</div>`
-                : `<img src="${item.thumb}" class="w-full h-full object-contain" alt="${item.name}" />`
-              }
+              ${media}
             </div>
             <div class="font-semibold">${isFood ? item.label : item.name}</div>
-            <div class="text-xs text-white/60 mb-2">${isFood ? `Cost ${item.cost} · You have ${(member.inventory[item.key]||0)}` : `Cost ${item.cost?.coins||0} · ${owned ? 'Owned' : 'Not owned'}`}</div>
+            <div class="text-xs text-white/60 mb-2">
+              ${isFood ? `Cost ${item.cost} · You have ${(member.inventory[item.key]||0)}`
+                       : isBg ? `Click to apply`
+                       : `Cost ${item.cost?.coins||0} · ${owned ? 'Owned' : 'Not owned'}`}
+            </div>
             <div class="grid grid-cols-2 gap-2">
-              ${isFood
+              ${
+                isFood
                 ? `<button class="bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.buyFood('${item.key}')">Buy</button>
                    <button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.feed('${item.key}')">Feed</button>`
+                : isBg
+                ? `<button class="col-span-2 bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.applyBackground('${item.key}')">Apply</button>`
                 : owned
                   ? `<button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.equip('${item.key}')">${equipped ? 'Unequip':'Equip'}</button>
                      <button class="bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded text-sm" onclick="Handlers.preview('${item.key}')">Preview</button>`
@@ -827,11 +967,30 @@
         };
 
         if (tab==="food"){
-          // Flatten food entries into array with key
-          Object.entries(CATALOG.food).forEach(([key,v])=> addCard({ ...v, key }, true));
+          Object.entries(CATALOG.food).forEach(([key,v])=> addCard({ ...v, key }, "food"));
+        } else if (tab==="background"){
+          CATALOG.background.forEach(b => addCard(b, "background"));
         } else {
-          (CATALOG[tab]||[]).forEach(addCard);
+          (CATALOG[tab]||[]).forEach(i=> addCard(i, tab));
         }
+      },
+
+      renderChat(){
+        const state = loadState();
+        const team = state.teams[session.teamCode];
+        const feed = document.getElementById("chatFeed");
+        feed.innerHTML = "";
+        team.chat.slice(-100).forEach(msg=>{
+          const row = document.createElement("div");
+          row.className = "flex items-start gap-2";
+          row.innerHTML = `
+            <div class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+              <div class="text-xs text-white/60">${msg.name} • ${new Date(msg.at).toLocaleTimeString()}</div>
+              <div class="text-sm">${msg.text}</div>
+            </div>`;
+          feed.appendChild(row);
+        });
+        feed.scrollTop = feed.scrollHeight;
       }
     };
 
@@ -865,6 +1024,12 @@
         img.style.transform = `translate(${o.x}px, ${o.y}px) scale(${o.scale}) rotate(${o.rotate}deg)`;
         wrap.appendChild(img);
       });
+    }
+    function applyBackground(member){
+      const bgKey = member.equipped.background || "bg_meadow";
+      const bgItem = (CATALOG.background||[]).find(b=>b.key===bgKey);
+      const can = document.getElementById("llamaCanvas");
+      can.style.background = bgItem ? bgItem.bgCSS : "transparent";
     }
 
     /****************
@@ -939,7 +1104,7 @@
           });
         });
         saveState(state);
-        UI.toast("Activities saved and published to team", "success");
+        UI.toast("Activities saved and published", "success");
         Screens.renderManager();
       },
 
@@ -986,11 +1151,12 @@
         const lower = newName.toLowerCase();
         if (profanityList.some(bad => lower.includes(bad))) return UI.toast("Please use a different name", "error");
         const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        member.llama.name = newName.trim(); saveState(state); UI.toast("Name updated", "success"); Screens.renderRep();
+        member.llama.name = newName.trim();
+        saveState(state);
+        UI.toast("Name updated", "success");
+        Screens.renderRep();
       },
-      preview(key){ // (visual only) set as equipped then revert? We'll just equip preview
-        this.equip(key);
-      },
+      preview(key){ this.equip(key); },
       buy(key){
         const item = findItemByKey(key); if (!item) return;
         const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
@@ -1001,6 +1167,9 @@
         saveState(state);
         UI.toast("Purchased", "success");
         Screens.renderShop(); Screens.renderRep();
+        // Badge: accessorizer if 3+ equipped
+        const eqCount = ["hat","neck","pants","shoes"].filter(s=>member.equipped[s]).length + (member.equipped.accessories||[]).length;
+        if (eqCount >= 3) Badges.unlock(member, "accessor_3");
       },
       equip(key){
         const item = findItemByKey(key); if (!item) return;
@@ -1015,6 +1184,15 @@
           else member.equipped[item.slot] = key;
         }
         saveState(state);
+        Screens.renderRep(); Screens.renderShop();
+        const eqCount = ["hat","neck","pants","shoes"].filter(s=>member.equipped[s]).length + (member.equipped.accessories||[]).length;
+        if (eqCount >= 3) Badges.unlock(member, "accessor_3");
+      },
+      applyBackground(key){
+        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
+        member.equipped.background = key;
+        saveState(state);
+        UI.toast("Background applied", "success");
         Screens.renderRep(); Screens.renderShop();
       },
 
@@ -1041,22 +1219,37 @@
         } else { UI.toast("No item available", "warn"); }
       },
 
-      // Progress
+      // Progress & path
       adjustProgress(idx, delta){
         const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
         const day = todayKey(); const act = team.activities[idx]; const slot = member.progress[day][idx]; if (!act?.target) return;
-        slot.count = Math.max(0, Math.min(act.target, (slot.count||0) + delta));
-        if (slot.count === act.target) {
+        const before = slot.count||0;
+        slot.count = Math.max(0, Math.min(act.target, before + delta));
+        if (before < act.target && slot.count === act.target) {
           member.coins += 5; member.llama.happiness = Math.min(100, member.llama.happiness + 5);
           Domain.addXP(member, 4); UI.toast(`Completed: ${act.label}`, "success");
+          this.checkPathComplete(member, team);
         }
         saveState(state); Screens.renderRep();
       },
       toggleDone(idx, checked){
         const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
         const day = todayKey(); const slot = member.progress[day][idx]; slot.done = !!checked;
-        if (slot.done) { member.coins += 3; member.llama.happiness = Math.min(100, member.llama.happiness + 4); Domain.addXP(member, 3); }
+        if (slot.done) {
+          member.coins += 3; member.llama.happiness = Math.min(100, member.llama.happiness + 4);
+          Domain.addXP(member, 3);
+          this.checkPathComplete(member, team);
+        }
         saveState(state); Screens.renderRep();
+      },
+      checkPathComplete(member, team){
+        const day = todayKey();
+        const allDone = (team.activities||[]).slice(0,4).every((a,i)=> a.target ? (member.progress[day][i].count>=a.target) : !!member.progress[day][i].done);
+        if (allDone) {
+          member.coins += 8; Domain.addXP(member, 6);
+          UI.toast("Path complete! +8 coins", "success");
+          Badges.unlock(member, "path_master");
+        }
       },
 
       // Mood (emoji modal)
@@ -1064,13 +1257,34 @@
         const state = loadState();
         const team = state.teams[session.teamCode];
         const member = team.members[session.email];
-        member.checkins[todayKey()] = { mood: val, at: Date.now() };
+        const now = new Date();
+        member.checkins[todayKey()] = { mood: val, at: now.getTime() };
+        // Early bird badge
+        if (now.getHours() < 10) Badges.unlock(member, "early_bird");
         member.llama.happiness = Math.min(100, member.llama.happiness + Math.max(0, val-2));
         saveState(state);
         UI.toast("Mood saved", "success");
         UI.closeMoodModal();
         Screens.renderRep();
         Screens.renderManager();
+      },
+
+      // Chat (local demo)
+      sendChat(e){
+        e.preventDefault();
+        const input = document.getElementById("chatInput");
+        const text = input.value.trim(); if (!text) return;
+        const state = loadState(); const team = state.teams[session.teamCode];
+        const me = team.members[session.email] || { firstName: session.email };
+        team.chat.push({ from: session.email, name: me.firstName || session.email, text, at: Date.now() });
+        // Gift giver badge (use chat volume as social proxy)
+        if ((team.chat.filter(m=>m.from===session.email).length) === 5) {
+          const member = team.members[session.email];
+          Badges.unlock(member, "giver_5");
+        }
+        saveState(state);
+        input.value = "";
+        Screens.renderChat();
       },
 
       // Gifts (food only)
@@ -1132,7 +1346,8 @@
             { label: "Prep opportunities", target: null }
           ],
           pending: [],
-          members: {}
+          members: {},
+          chat: []
         };
         const m1 = Domain.ensureMember(s.teams[code], "alex@example.com"); m1.firstName = "Alex"; m1.coins = 35;
         const m2 = Domain.ensureMember(s.teams[code], "casey@example.com"); m2.firstName = "Casey"; m2.coins = 22;
