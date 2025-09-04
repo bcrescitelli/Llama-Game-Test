@@ -2,75 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
   <title>LlamaLog – Team Productivity Platform</title>
-
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts & base styles -->
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-    html, body { height: 100%; }
-    body { font-family: "Poppins", sans-serif; }
-    .glass { background: rgba(255,255,255,.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.18) }
-    .grad-bg { background: linear-gradient(135deg,#1e1b4b, #0f172a 55%, #0b1229) }
-    .btn-grad { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
-    .btn-grad-2 { background: linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%) }
-    .notification-badge { animation: pulse 2s infinite }
-    @keyframes pulse {0%,100%{opacity:1} 50%{opacity:.5}}
-    /* Toasts */
-    .toast-enter { transform: translateY(-8px); opacity: 0 }
-    .toast-enter-active { transform: translateY(0); opacity: 1; transition: all .25s ease }
-    .toast-leave { transform: translateY(0); opacity: 1 }
-    .toast-leave-active { transform: translateY(-8px); opacity: 0; transition: all .25s ease }
-    /* Mood backgrounds */
-    .mood-happy { background: linear-gradient(135deg, #0ea5e9, #22c55e 60%) }
-    .mood-sad { background: linear-gradient(135deg, #3b82f6, #0ea5e9 60%) }
-    .mood-angry { background: linear-gradient(135deg, #ef4444, #f97316 60%) }
-    .mood-energized { background: linear-gradient(135deg, #8b5cf6, #06b6d4 60%) }
-    .icon-btn { width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; border-radius: .75rem }
-    /* Llama canvas layering */
-    .llama-canvas { position: relative; width: 340px; height: 340px; margin: 0 auto; border-radius: 1rem; overflow: hidden; }
-    .llama-layer { position: absolute; inset: 0; object-fit: contain; transform-origin: center; pointer-events: none; }
-    /* Shop tabs */
-    .tab-btn { padding:.5rem .75rem; border-radius:.75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
-    .tab-btn.active { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) }
-    /* Modal shell */
-    .modal { position: fixed; inset: 0; z-index: 999; display: none; align-items: center; justify-content: center; padding:1rem; }
-    .modal.show { display: flex; }
-    /* Badge styles */
-    .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.35rem .55rem; border-radius:.75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); }
+    body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18)}
+    .grad{background:linear-gradient(135deg,#1e1b4b,#0f172a 55%,#0b1229)}
+    .tab-btn{padding:.5rem .75rem;border-radius:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+    .tab-btn.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+    .modal{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal.show{display:flex}
+    .llama-canvas{position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden}
+    .llama-layer{position:absolute;inset:0;object-fit:contain;transform-origin:center;pointer-events:none}
+    .icon-btn{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem}
+    .mood-happy{background:linear-gradient(135deg,#0ea5e9,#22c55e 60%)}
+    .mood-sad{background:linear-gradient(135deg,#3b82f6,#0ea5e9 60%)}
+    .mood-angry{background:linear-gradient(135deg,#ef4444,#f97316 60%)}
+    .mood-energized{background:linear-gradient(135deg,#8b5cf6,#06b6d4 60%)}
+    .badge{display:inline-flex;gap:.5rem;align-items:center;padding:.35rem .55rem;border-radius:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+    .btn-grad{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
+    .btn-grad-2{background:linear-gradient(135deg,#0ea5e9 0%,#22d3ee 100%)}
+    .notif{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:9999px;font-size:10px;line-height:1;padding:2px 5px}
   </style>
 </head>
-
-<body class="grad-bg min-h-screen text-white">
-  <!-- Toast Container -->
+<body class="grad min-h-screen text-white">
   <div id="toastContainer" class="fixed top-4 right-4 space-y-2 z-[9999]"></div>
 
-  <!-- Landing Page -->
+  <!-- Landing -->
   <section id="landingPage" class="min-h-screen flex items-center justify-center p-4">
     <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
       <div class="text-6xl mb-4">🦙</div>
       <h1 class="text-4xl font-bold mb-2">LlamaLog</h1>
       <p class="text-white/80 mb-8">Make work feel lighter with a caring llama and friendly team goals</p>
-
       <div class="space-y-4">
-        <button onclick="UI.show('managerSignup')" class="w-full btn-grad text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          I am a Manager – Create Team
-        </button>
-        <button onclick="UI.show('managerLogin')" class="w-full bg-white/10 text-white py-3 px-6 rounded-xl font-semibold hover:bg-white/20 transition">
-          Manager – Access Homebase
-        </button>
-        <button onclick="UI.show('repJoin')" class="w-full btn-grad-2 text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          I am a Rep – Join Team
-        </button>
-        <button onclick="UI.show('repLogin')" class="w-full bg-white/10 text-white py-3 px-6 rounded-xl font-semibold hover:bg-white/20 transition">
-          Rep – Access Dashboard
-        </button>
+        <button onclick="UI.show('managerSignup')" class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Manager – Create Team</button>
+        <button onclick="UI.show('managerLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Manager – Access Homebase</button>
+        <button onclick="UI.show('repJoin')" class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">I am a Rep – Join Team</button>
+        <button onclick="UI.show('repLogin')" class="w-full bg-white/10 py-3 rounded-xl font-semibold hover:bg-white/20 transition">Rep – Access Dashboard</button>
       </div>
     </div>
   </section>
@@ -80,11 +50,9 @@
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Create Your Team</h2>
       <form onsubmit="Handlers.createManagerAccount(event)" class="space-y-4">
-        <input id="managerEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-        <input id="teamName" type="text" placeholder="Team name" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-        <button type="submit" class="w-full btn-grad text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          Create Team and Generate Code
-        </button>
+        <input id="managerEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <input id="teamName" type="text" placeholder="Team name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Create Team & Code</button>
       </form>
       <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
     </div>
@@ -95,11 +63,9 @@
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Access Homebase</h2>
       <form onsubmit="Handlers.managerLogin(event)" class="space-y-4">
-        <input id="loginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-        <input id="loginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-        <button type="submit" class="w-full btn-grad text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          Access Dashboard
-        </button>
+        <input id="loginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <input id="loginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <button class="w-full btn-grad py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
       </form>
       <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
     </div>
@@ -110,12 +76,10 @@
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Join Your Team</h2>
       <form onsubmit="Handlers.repJoinTeam(event)" class="space-y-4">
-        <input id="repFirstName" type="text" placeholder="Your first name" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-        <input id="repEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-        <input id="repTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-        <button type="submit" class="w-full btn-grad-2 text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          Request to Join
-        </button>
+        <input id="repFirstName" type="text" placeholder="Your first name" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <input id="repEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <input id="repTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Request to Join</button>
       </form>
       <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
     </div>
@@ -126,25 +90,21 @@
     <div class="glass rounded-3xl p-8 max-w-md w-full">
       <h2 class="text-3xl font-bold mb-6 text-center">Access Your Dashboard</h2>
       <form onsubmit="Handlers.repLogin(event)" class="space-y-4">
-        <input id="repLoginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-        <input id="repLoginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 text-white placeholder-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-        <button type="submit" class="w-full btn-grad-2 text-white py-3 px-6 rounded-xl font-semibold hover:brightness-110 transition">
-          Access Dashboard
-        </button>
+        <input id="repLoginEmail" type="email" placeholder="Your email" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <input id="repLoginTeamCode" type="text" placeholder="Team code" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20">
+        <button class="w-full btn-grad-2 py-3 rounded-xl font-semibold hover:brightness-110 transition">Access Dashboard</button>
       </form>
       <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
     </div>
   </section>
 
-  <!-- Pending Approval -->
+  <!-- Pending -->
   <section id="pendingApproval" class="hidden min-h-screen flex items-center justify-center p-4">
     <div class="glass rounded-3xl p-8 max-w-md w-full text-center">
       <div class="text-6xl mb-4">⏳</div>
       <h2 class="text-3xl font-bold mb-3">Approval Pending</h2>
       <p class="text-white/80 mb-6">Your manager will approve your request soon</p>
-      <button onclick="Handlers.checkApprovalStatus()" class="bg-sky-500 hover:bg-sky-600 text-white py-2 px-6 rounded-xl transition">
-        Check Status
-      </button>
+      <button onclick="Handlers.checkApprovalStatus()" class="bg-sky-500 hover:bg-sky-600 py-2 px-6 rounded-xl transition">Check Status</button>
       <button onclick="UI.show('landingPage')" class="w-full mt-4 text-white/70 hover:text-white transition">← Back</button>
     </div>
   </section>
@@ -152,39 +112,33 @@
   <!-- Manager Dashboard -->
   <section id="managerDashboard" class="hidden min-h-screen p-4">
     <div class="max-w-7xl mx-auto space-y-6">
-      <!-- Header -->
       <div class="glass rounded-2xl p-6">
         <div class="flex flex-wrap gap-4 items-center justify-between">
           <div>
             <h1 class="text-3xl font-bold">Manager Homebase</h1>
-            <p class="text-white/80" id="teamInfo">Team: Loading...</p>
+            <p class="text-white/80" id="teamInfo">Team: Loading…</p>
           </div>
           <div class="flex items-center gap-3">
-            <button id="pendingBell" onclick="UI.show('managerDashboard')" class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
+            <button class="icon-btn bg-yellow-500 hover:bg-yellow-600 relative transition" title="Pending approvals">
               <span>🔔</span>
-              <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded notification-badge">0</span>
+              <span id="pendingBadge" class="hidden absolute -top-1 -right-1 text-[10px] bg-black/80 px-1.5 py-[2px] rounded">0</span>
             </button>
-            <button onclick="UI.openChat()" class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Team chat</button>
+            <button data-btn="chat" onclick="UI.openChat()" class="relative px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Team chat <span id="chatBadgeMgr" class="notif hidden">0</span></button>
             <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
       </div>
 
-      <!-- Approvals + Activities + Checkins -->
       <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Pending Approvals -->
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Pending approvals</h2>
           <div id="approvalsList" class="space-y-3"></div>
-          <button onclick="Handlers.refreshApprovals()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">
-            Refresh
-          </button>
+          <button onclick="Handlers.refreshApprovals()" class="mt-4 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded">Refresh</button>
         </div>
 
-        <!-- Custom Activities (4) -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-2">Daily focus (Duolingo-style path)</h2>
+            <h2 class="text-xl font-semibold mb-2">Daily focus</h2>
             <span class="text-white/60 text-sm">“Log 3 calls” auto-detects the 3</span>
           </div>
           <form onsubmit="Handlers.saveActivities(event)" class="grid md:grid-cols-2 gap-3">
@@ -192,35 +146,12 @@
             <input id="act2" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 2">
             <input id="act3" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 3">
             <input id="act4" class="bg-white/10 border border-white/20 rounded-xl p-3" placeholder="Activity 4">
-            <button type="submit" class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
+            <button class="md:col-span-2 btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Save & publish</button>
           </form>
         </div>
 
-        <!-- Team Mood Chart -->
-        <div class="glass rounded-2xl p-6 lg:col-span-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-2">Team mood this week</h2>
-            <span class="text-white/60 text-sm">Average of emoji check-ins</span>
-          </div>
-          <div id="moodChart" class="w-full overflow-x-auto"></div>
-        </div>
-      </div>
-
-      <!-- Leaderboard and Gifting -->
-      <div class="grid lg:grid-cols-2 gap-6">
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Leaderboard</h2>
-          <div id="leaderboard" class="space-y-2"></div>
-        </div>
-        <div class="glass rounded-2xl p-6">
-          <h2 class="text-xl font-semibold mb-3">Team gifting (food)</h2>
-          <form onsubmit="Handlers.managerGift(event)" class="grid md:grid-cols-3 gap-3">
-            <select id="giftRecipient" class="bg-white/10 border border-white/20 rounded-xl p-3"></select>
-            <select id="giftItem" class="bg-white/10 border border-white/20 rounded-xl p-3"></select>
-            <button class="btn-grad rounded-xl py-3 font-semibold hover:brightness-110 transition">Send gift</button>
-          </form>
-          <p class="mt-3 text-sm text-white/70">Managers can send food items to any team member</p>
-        </div>
+        <!-- Town panel (shared) -->
+        <div class="glass rounded-2xl p-6 lg:col-span-3" id="townPanel"></div>
       </div>
     </div>
   </section>
@@ -228,7 +159,6 @@
   <!-- Rep Dashboard -->
   <section id="repDashboard" class="hidden min-h-screen p-4">
     <div class="max-w-6xl mx-auto space-y-6">
-      <!-- Header -->
       <div id="repHeader" class="rounded-2xl p-6 glass">
         <div class="flex flex-wrap gap-4 items-center justify-between">
           <div class="flex items-center gap-4">
@@ -240,29 +170,25 @@
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <button onclick="UI.openMoodModal()" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600">Daily mood</button>
-            <button onclick="UI.openShop()" class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600">Open shop</button>
-            <button onclick="UI.openChat()" class="px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600">Team chat</button>
+            <button class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600" onclick="UI.openMood()">Daily mood</button>
+            <button class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600" onclick="UI.openShop()">Open shop</button>
+            <button data-btn="chat" class="relative px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600" onclick="UI.openChat()">Team chat <span id="chatBadgeRep" class="notif hidden">0</span></button>
             <button onclick="Handlers.logout()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">Log out</button>
           </div>
         </div>
       </div>
 
-      <!-- Llama + path -->
       <div class="grid lg:grid-cols-3 gap-6">
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Your llama</h2>
-
           <div id="llamaCanvas" class="llama-canvas">
-            <!-- Background (CSS) is applied to this container -->
             <img id="llama-base" class="llama-layer" alt="llama" src="">
             <img id="layer-hat" class="llama-layer" alt="">
             <img id="layer-neck" class="llama-layer" alt="">
             <img id="layer-pants" class="llama-layer" alt="">
             <img id="layer-shoes" class="llama-layer" alt="">
-            <div id="layer-accessories" class="llama-layer" style="position:absolute; inset:0;"></div>
+            <div id="layer-accessories" class="llama-layer" style="position:absolute;inset:0;"></div>
           </div>
-
           <div class="space-y-3 mt-4">
             <div class="flex items-center justify-between">
               <div>
@@ -273,43 +199,28 @@
             </div>
             <div>
               <div class="text-sm mb-1">Hunger</div>
-              <div class="w-full bg-white/10 h-3 rounded">
-                <div id="hungerBar" class="h-3 rounded bg-amber-400" style="width: 50%"></div>
-              </div>
+              <div class="w-full bg-white/10 h-3 rounded"><div id="hungerBar" class="h-3 rounded bg-amber-400" style="width:50%"></div></div>
             </div>
             <div>
               <div class="text-sm mb-1">Happiness</div>
-              <div class="w-full bg-white/10 h-3 rounded">
-                <div id="happinessBar" class="h-3 rounded bg-emerald-400" style="width: 50%"></div>
-              </div>
+              <div class="w-full bg-white/10 h-3 rounded"><div id="happinessBar" class="h-3 rounded bg-emerald-400" style="width:50%"></div></div>
             </div>
-
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
-              <button onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
-              <button onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
+              <button data-btn="food" onclick="Handlers.feed('hay')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🌾 Hay</button>
+              <button data-btn="food" onclick="Handlers.feed('carrot')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">🥕 Carrot</button>
+              <button data-btn="food" onclick="Handlers.feed('espresso')" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl">☕ Espresso</button>
             </div>
           </div>
         </div>
 
-        <!-- Duolingo-style path + Activities -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-1">Today’s path</h2>
-            <span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span>
-          </div>
-
+          <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-1">Today’s path</h2><span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span></div>
           <div id="pathNodes" class="flex flex-wrap gap-3 mt-2"></div>
           <div id="activitiesList" class="mt-4 space-y-3"></div>
         </div>
 
-        <!-- Team Social -->
         <div class="glass rounded-2xl p-6 lg:col-span-2">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold mb-3">Team social</h2>
-            <span id="coinsLabel" class="text-sm text-white/70">Coins: 0</span>
-          </div>
-
+          <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Team social</h2><span id="coinsLabel" class="text-sm text-white/70">Coins: 0</span></div>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <h3 class="font-semibold mb-2">Send a food gift</h3>
@@ -326,12 +237,14 @@
           </div>
         </div>
 
-        <!-- Achievements -->
         <div class="glass rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-3">Badges</h2>
           <div id="badgesGrid" class="grid grid-cols-2 gap-2"></div>
         </div>
       </div>
+
+      <!-- Town panel (rep) -->
+      <div class="glass rounded-2xl p-6" id="townPanel"></div>
     </div>
   </section>
 
@@ -346,7 +259,6 @@
           <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeShop()">✕</button>
         </div>
       </div>
-
       <div class="flex flex-wrap gap-2 mb-4">
         <button class="tab-btn active" data-tab="hats" onclick="UI.switchShopTab('hats', this)">Hats</button>
         <button class="tab-btn" data-tab="neckwear" onclick="UI.switchShopTab('neckwear', this)">Neckwear</button>
@@ -356,20 +268,18 @@
         <button class="tab-btn" data-tab="background" onclick="UI.switchShopTab('background', this)">Background</button>
         <button class="tab-btn" data-tab="food" onclick="UI.switchShopTab('food', this)">Food</button>
       </div>
-
       <div id="shopGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-
       <button onclick="UI.closeShop()" class="mt-4 w-full bg-white/10 hover:bg-white/20 py-2 rounded">Close</button>
     </div>
   </div>
 
   <!-- MOOD MODAL -->
   <div id="moodModal" class="modal">
-    <div class="absolute inset-0 bg-black/60" onclick="UI.closeMoodModal()"></div>
+    <div class="absolute inset-0 bg-black/60" onclick="UI.closeMood()"></div>
     <div class="relative glass rounded-2xl p-6 max-w-md w-full">
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-semibold">How are you feeling?</h2>
-        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMoodModal()">✕</button>
+        <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded" onclick="UI.closeMood()">✕</button>
       </div>
       <div class="grid grid-cols-5 gap-3">
         <button class="bg-white/10 hover:bg-white/20 rounded-xl p-3 text-center" onclick="Handlers.submitMood(1)">😫<div class="text-xs mt-1">1</div></button>
@@ -397,975 +307,9 @@
     </div>
   </div>
 
-  <!-- App Script -->
-  <script>
-    /********************
-     * IMAGE CATALOG (your Imgur links)
-     ********************/
-    const CATALOG = {
-      llamaBase: "https://i.imgur.com/zgQ8490.png",
-      hats: [
-        { key:"cool_hat", name:"Cool Hat", thumb:"https://i.imgur.com/r6L0Yg1.png", image:"https://i.imgur.com/r6L0Yg1.png", cost:{coins:20}, slot:"hat", offset:{x:0,y:-100,scale:1.0,rotate:0} },
-        { key:"silly_hat", name:"Silly Hat", thumb:"https://i.imgur.com/1uG1sJh.png", image:"https://i.imgur.com/tWUl2Iz.png", cost:{coins:14}, slot:"hat", offset:{x:0,y:-100,scale:1.0,rotate:0} },
-      ],
-      neckwear: [
-        { key:"cool_neck", name:"Cool Necktie", thumb:"https://i.imgur.com/BfDS7mI.png", image:"https://i.imgur.com/X4wSwdR.png", cost:{coins:12}, slot:"neck", offset:{x:0,y:18,scale:1.0,rotate:0} },
-        { key:"silly_neck", name:"Silly Neck Accessory", thumb:"https://i.imgur.com/rRoOY9E.png", image:"https://i.imgur.com/wYOH3ah.png", cost:{coins:10}, slot:"neck", offset:{x:0,y:18,scale:1.0,rotate:0} },
-      ],
-      pants: [
-        { key:"cool_pants", name:"Cool Pants", thumb:"https://i.imgur.com/lzPAKyL.png", image:"https://i.imgur.com/O2sMwsc.png", cost:{coins:18}, slot:"pants", offset:{x:0,y:75,scale:1.0,rotate:0} },
-        { key:"silly_pants", name:"Silly Pants", thumb:"https://i.imgur.com/A6gfUej.png", image:"https://i.imgur.com/1z0ZDVZ.png", cost:{coins:15}, slot:"pants", offset:{x:0,y:75,scale:1.0,rotate:0} },
-      ],
-      shoes: [
-        { key:"cool_shoes", name:"Cool Shoes", thumb:"https://i.imgur.com/YrmbXe9.png", image:"https://i.imgur.com/90C8TNe.png", cost:{coins:14}, slot:"shoes", offset:{x:0,y:120,scale:1.0,rotate:0} },
-        { key:"silly_shoes", name:"Silly Shoes", thumb:"https://i.imgur.com/K0GUBle.png", image:"https://i.imgur.com/xooykYg.png", cost:{coins:12}, slot:"shoes", offset:{x:0,y:120,scale:1.0,rotate:0} },
-      ],
-      accessories: [
-        { key:"sunglasses", name:"Sunglasses", thumb:"https://i.imgur.com/3PCFnWc.png", image:"https://i.imgur.com/UZ6jX96.png", cost:{coins:10}, slot:"accessory", offset:{x:0,y:-12,scale:1.0,rotate:0} },
-        { key:"cell_phone", name:"Cellphone", thumb:"https://i.imgur.com/QLyFZPb.png", image:"https://i.imgur.com/zvjSDcX.png", cost:{coins:10}, slot:"accessory", offset:{x:40,y:40,scale:1.0,rotate:0} },
-        { key:"iced_coffee", name:"Iced Coffee", thumb:"https://i.imgur.com/gzk37Mh.png", image:"https://i.imgur.com/EbJ63wc.png", cost:{coins:10}, slot:"accessory", offset:{x:-40,y:45,scale:1.0,rotate:0} },
-        { key:"tote_bag", name:"Tote Bag", thumb:"https://i.imgur.com/xGRXCEX.png", image:"https://i.imgur.com/yE5XauC.png", cost:{coins:10}, slot:"accessory", offset:{x:-10,y:50,scale:1.0,rotate:0} },
-        { key:"protein_shaker", name:"Protein Shaker", thumb:"https://i.imgur.com/DH1H5c1.png", image:"https://i.imgur.com/dqSy2Ji.png", cost:{coins:8}, slot:"accessory", offset:{x:30,y:55,scale:1.0,rotate:0} },
-        { key:"mustache", name:"Mustache", thumb:"https://i.imgur.com/f2RKF47.png", image:"https://i.imgur.com/kngbJ8M.png", cost:{coins:6}, slot:"accessory", offset:{x:0,y:-2,scale:1.0,rotate:0} },
-      ],
-      background: [
-        { key:"bg_meadow", name:"Meadow", thumbCSS:"linear-gradient(135deg,#86efac,#60a5fa)", bgCSS:"linear-gradient(135deg,#a7f3d0,#60a5fa)" },
-        { key:"bg_office", name:"Office", thumbCSS:"linear-gradient(135deg,#cbd5e1,#94a3b8)", bgCSS:"linear-gradient(135deg,#e5e7eb,#94a3b8)" },
-        { key:"bg_night", name:"Night Sky", thumbCSS:"linear-gradient(135deg,#0ea5e9,#111827)", bgCSS:"linear-gradient(135deg,#0ea5e9,#111827)" },
-      ],
-      // Food (emoji thumbnails; consumables)
-      food: {
-        hay:     { label: "Hay", emoji: "🌾", hunger: 20, happiness: 2, cost: 5 },
-        carrot:  { label: "Carrot", emoji: "🥕", hunger: 15, happiness: 5, cost: 8 },
-        espresso:{ label: "Espresso", emoji: "☕", hunger: 0,  happiness: 8, cost: 10 }
-      }
-    };
-
-    /***************
-     * State model *
-     ***************/
-    const STORAGE_KEY = "llamalog_state_v5";
-    const profanityList = ["fuck","shit","bitch","asshole","dick","cunt","bastard","slut","whore","fag","nigger","retard","twat","prick","wank","bollock"];
-
-    function loadState() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { teams: {} }; }
-      catch { return { teams: {} }; }
-    }
-    function saveState(state) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    function uid(len = 12) {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const arr = new Uint8Array(len);
-      crypto.getRandomValues(arr);
-      return Array.from(arr, b => chars[b % chars.length]).join("");
-    }
-    function todayKey() { return new Date().toISOString().slice(0,10); }
-
-    /****************
-     * UI utilities *
-     ****************/
-    const UI = {
-      show(id) {
-        document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
-        document.getElementById(id)?.classList.remove("hidden");
-        if (id === "managerDashboard") Screens.renderManager();
-        if (id === "repDashboard") Screens.renderRep();
-      },
-      toast(msg, type = "info") {
-        const container = document.getElementById("toastContainer");
-        const card = document.createElement("div");
-        const base = "toast-enter glass rounded-xl px-4 py-3 text-sm flex items-start gap-3";
-        const color = type === "success" ? "border-emerald-400"
-                    : type === "error" ? "border-rose-400"
-                    : type === "warn" ? "border-amber-400"
-                    : "border-white/20";
-        card.className = `${base} ${color}`;
-        card.innerHTML = `<div class="flex-1">${msg}</div><button class="bg-white/10 hover:bg-white/20 px-2 rounded" aria-label="Dismiss">✕</button>`;
-        card.querySelector("button").onclick = () => card.remove();
-        container.appendChild(card);
-        requestAnimationFrame(() => card.classList.replace("toast-enter","toast-enter-active"));
-        setTimeout(() => {
-          if (!card.isConnected) return;
-          card.classList.add("toast-leave");
-          card.classList.replace("toast-enter-active","toast-leave-active");
-          setTimeout(() => card.remove(), 250);
-        }, 3500);
-      },
-      format(name, max=24){ if(!name) return ""; return name.length>max ? name.slice(0,max-1)+"…" : name; },
-      openShop(){ document.getElementById("shopModal").classList.add("show"); Screens.renderShop("hats"); },
-      closeShop(){ document.getElementById("shopModal").classList.remove("show"); },
-      switchShopTab(tab, btn){
-        document.querySelectorAll("#shopModal .tab-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        Screens.renderShop(tab);
-      },
-      openMoodModal(){ document.getElementById("moodModal").classList.add("show"); },
-      closeMoodModal(){ document.getElementById("moodModal").classList.remove("show"); },
-      openChat(){ document.getElementById("chatModal").classList.add("show"); Screens.renderChat(); },
-      closeChat(){ document.getElementById("chatModal").classList.remove("show"); }
-    };
-    // Esc key closes modals
-    document.addEventListener("keydown", (e)=> {
-      if (e.key === "Escape") {
-        UI.closeShop(); UI.closeMoodModal(); UI.closeChat();
-      }
-    });
-
-    /*****************
-     * Auth session  *
-     *****************/
-    let session = { role: null, teamCode: null, email: null };
-
-    /**********************
-     * Domain operations  *
-     **********************/
-    const Domain = {
-      ensureTeam(state, code) {
-        if (!state.teams[code]) state.teams[code] = {
-          teamName: "",
-          managerEmail: "",
-          createdAt: Date.now(),
-          activities: [],
-          pending: [],
-          members: {},
-          chat: [] // [{from, name, text, at}]
-        };
-        return state.teams[code];
-      },
-      parseActivity(raw) {
-        if (!raw) return null;
-        const match = raw.match(/(\d+)/);
-        const target = match ? parseInt(match[1],10) : null;
-        let label = raw.replace(/\d+/g,"").trim();
-        if (!label) label = raw.trim();
-        return { label, target: isNaN(target) ? null : target };
-      },
-      ensureMember(team, email) {
-        if (!team.members[email]) {
-          // Random personality
-          const foods = Object.keys(CATALOG.food);
-          const fav = foods[Math.floor(Math.random()*foods.length)];
-          let dis = foods[Math.floor(Math.random()*foods.length)];
-          if (dis===fav) dis = foods[(foods.indexOf(dis)+1)%foods.length];
-
-          team.members[email] = {
-            firstName: "",
-            email,
-            coins: 20,
-            llama: {
-              name: "",
-              hunger: 60,
-              happiness: 60,
-              xp: 0,
-              level: 1,
-              lastTick: Date.now(),
-              fedStreak: 0
-            },
-            owned: {},
-            equipped: { hat:null, neck:null, pants:null, shoes:null, accessories: [], background: "bg_meadow" },
-            inventory: { hay: 1, carrot: 1, espresso: 0 },
-            giftsInbox: [],
-            achievements: {
-              // progress counters
-              wellFedStreak: 0, giftGiver: 0, productStreak: 0,
-              // badges unlocked: key -> timestamp
-              badges: {}
-            },
-            progress: {},
-            checkins: {},
-            // streaks
-            streak: { count: 0, lastDay: null },
-            // personality
-            personality: { favoriteFood: fav, dislikedFood: dis }
-          };
-        }
-        return team.members[email];
-      },
-      tickLlama(member) {
-        const now = Date.now();
-        const elapsedMin = Math.max(0, Math.round((now - (member.llama.lastTick || now)) / 60000));
-        if (elapsedMin <= 0) return;
-        member.llama.lastTick = now;
-        member.llama.hunger = Math.max(0, member.llama.hunger - 0.5 * (elapsedMin/5));
-        const hungerPenalty = member.llama.hunger < 30 ? 0.6 : member.llama.hunger < 50 ? 0.3 : 0;
-        member.llama.happiness = Math.max(0, Math.min(100, member.llama.happiness - hungerPenalty * (elapsedMin/5)));
-      },
-      addXP(member, amount=2){
-        member.llama.xp += amount;
-        while (member.llama.xp >= member.llama.level * 50) {
-          member.llama.xp -= member.llama.level * 50;
-          member.llama.level += 1;
-          UI.toast("Your llama leveled up", "success");
-        }
-      },
-      feed(member, key){
-        const f = CATALOG.food[key]; if (!f) return false;
-        if ((member.inventory[key]||0) <= 0) return false;
-        member.inventory[key] -= 1;
-
-        // Personality effects
-        let happinessBoost = f.happiness;
-        if (key === member.personality.favoriteFood) happinessBoost += 2;
-        if (key === member.personality.dislikedFood) happinessBoost = Math.max(0, happinessBoost - 2);
-
-        member.llama.hunger = Math.min(100, member.llama.hunger + f.hunger);
-        member.llama.happiness = Math.min(100, member.llama.happiness + happinessBoost);
-        member.llama.fedStreak = Math.min(365, (member.llama.fedStreak || 0) + 1);
-        member.achievements.wellFedStreak = Math.max(member.achievements.wellFedStreak || 0, member.llama.fedStreak);
-        Domain.addXP(member, 3);
-        return true;
-      },
-      // Streak update each day user visits
-      updateStreak(member){
-        const today = todayKey();
-        if (member.streak.lastDay === today) return;
-        const prev = member.streak.lastDay;
-        const yest = new Date(); yest.setDate(yest.getDate()-1);
-        const yKey = yest.toISOString().slice(0,10);
-        if (!prev || prev !== yKey) member.streak.count = 1;
-        else member.streak.count += 1;
-        member.streak.lastDay = today;
-        // Rewards
-        member.coins += 2; // daily login reward
-        if (member.streak.count % 7 === 0) {
-          member.coins += 10;
-          UI.toast("Weekly streak bonus! +10 coins", "success");
-          Badges.unlock(member, "streak_7");
-        }
-        if (member.streak.count === 3) Badges.unlock(member, "streak_3");
-        if (member.streak.count === 14) Badges.unlock(member, "streak_14");
-      }
-    };
-
-    /*****************
-     * Badges system *
-     *****************/
-    const Badges = {
-      defs: {
-        streak_3:   { name: "Warm Up", desc: "3-day streak" },
-        streak_7:   { name: "One Week", desc: "7-day streak" },
-        streak_14:  { name: "Two Weeks", desc: "14-day streak" },
-        path_master:{ name: "Path Master", desc: "Completed today’s path" },
-        giver_5:    { name: "Gift Giver", desc: "Sent 5 gifts" },
-        accessor_3: { name: "Accessorizer", desc: "Equip 3 cosmetics at once" },
-        early_bird: { name: "Early Bird", desc: "Check-in before 10am" }
-      },
-      unlock(member, key){
-        if (member.achievements.badges[key]) return;
-        member.achievements.badges[key] = Date.now();
-        UI.toast(`Badge earned: ${this.defs[key]?.name || key}`, "success");
-      },
-      render(member){
-        const grid = document.getElementById("badgesGrid");
-        grid.innerHTML = "";
-        const keys = Object.keys(this.defs);
-        keys.forEach(k=>{
-          const unlocked = !!member.achievements.badges[k];
-          const div = document.createElement("div");
-          div.className = "badge";
-          div.innerHTML = `
-            <span>${unlocked ? "🏅" : "🔒"}</span>
-            <div>
-              <div class="font-semibold">${this.defs[k].name}</div>
-              <div class="text-xs text-white/70">${this.defs[k].desc}</div>
-            </div>
-          `;
-          grid.appendChild(div);
-        });
-      }
-    };
-
-    /*****************
-     * Screen binds  *
-     *****************/
-    const Screens = {
-      renderManager(){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        if (!team) return UI.show("landingPage");
-        document.getElementById("teamInfo").textContent =
-          `Team ${team.teamName} • Code ${session.teamCode} • Manager ${team.managerEmail}`;
-
-        // Approvals (flex, no overflow)
-        const approvalsEl = document.getElementById("approvalsList");
-        approvalsEl.innerHTML = "";
-        (team.pending || []).forEach((p, idx) => {
-          const row = document.createElement("div");
-          row.className = "flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3 gap-3 flex-wrap";
-          row.innerHTML = `
-            <div class="flex-1 min-w-[220px]">
-              <div class="font-medium">${UI.format(p.firstName)} <span class="text-white/60">(${UI.format(p.email)})</span></div>
-              <div class="text-xs text-white/60">Requested ${new Date(p.requestedAt).toLocaleString()}</div>
-            </div>
-            <div class="flex gap-2">
-              <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-2 rounded" onclick="Handlers.approve(${idx})">Approve</button>
-              <button class="bg-rose-500 hover:bg-rose-600 px-3 py-2 rounded" onclick="Handlers.reject(${idx})">Reject</button>
-            </div>
-          `;
-          approvalsEl.appendChild(row);
-        });
-
-        // Bell badge
-        const badge = document.getElementById("pendingBadge");
-        const count = (team.pending || []).length;
-        badge.textContent = count;
-        badge.classList.toggle("hidden", count === 0);
-
-        // Fill activities inputs
-        ["act1","act2","act3","act4"].forEach((id, i) => {
-          document.getElementById(id).value = team.activities[i]?.target
-            ? `${team.activities[i].label} ${team.activities[i].target}`
-            : (team.activities[i]?.label || "");
-        });
-
-        // Team mood chart (last 7 days)
-        const moodChart = document.getElementById("moodChart");
-        const days = Array.from({length:7}).map((_,i)=> { const d = new Date(); d.setDate(d.getDate() - (6-i)); return d.toISOString().slice(0,10); });
-        const points = days.map(day => {
-          const vals = Object.values(team.members).map(m => m.checkins?.[day]?.mood).filter(v => typeof v === "number");
-          if (!vals.length) return null;
-          const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-          return Math.round(avg*10)/10;
-        });
-
-        const width = 520, height = 160, barW = 60, gap = 16, maxVal = 5;
-        const svg = [
-          `<svg width="${Math.max(width, (barW+gap)*7+gap)}" height="${height}" viewBox="0 0 ${Math.max(width, (barW+gap)*7+gap)} ${height}" xmlns="http://www.w3.org/2000/svg">`,
-          `<rect x="0" y="0" width="100%" height="100%" fill="rgba(255,255,255,0.03)" rx="12"/>`
-        ];
-        days.forEach((day, i) => {
-          const val = points[i] || 0;
-          const h = (val / maxVal) * (height-40);
-          const x = gap + i*(barW+gap);
-          const y = height-20 - h;
-          svg.push(`<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="#60a5fa"/>`);
-          svg.push(`<text x="${x+barW/2}" y="${height-6}" text-anchor="middle" font-size="10" fill="#cbd5e1">${day.slice(5)}</text>`);
-          if (val) svg.push(`<text x="${x+barW/2}" y="${y-6}" text-anchor="middle" font-size="11" fill="#e2e8f0">${val}</text>`);
-        });
-        svg.push(`</svg>`);
-        moodChart.innerHTML = svg.join("");
-
-        // Leaderboard
-        const lb = Object.values(team.members)
-          .map(m => ({ name: m.firstName || m.email, coins: m.coins, lvl: m.llama.level }))
-          .sort((a,b)=> (b.coins - a.coins) || (b.lvl - a.lvl))
-          .slice(0,10);
-        const lbEl = document.getElementById("leaderboard");
-        lbEl.innerHTML = "";
-        lb.forEach((m, i) => {
-          const row = document.createElement("div");
-          row.className = "flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3";
-          row.innerHTML = `<div class="text-white/80">#${i+1}</div>
-            <div class="font-semibold">${UI.format(m.name)}</div>
-            <div class="text-sm text-white/70">Coins ${m.coins} • Lv ${m.lvl}</div>`;
-          lbEl.appendChild(row);
-        });
-
-        // Gifting selectors (food only)
-        const recSel = document.getElementById("giftRecipient");
-        recSel.innerHTML = "";
-        Object.values(team.members).forEach(m=>{
-          const opt = document.createElement("option");
-          opt.value = m.email; opt.textContent = m.firstName || m.email;
-          recSel.appendChild(opt);
-        });
-        const giftSel = document.getElementById("giftItem"); giftSel.innerHTML = "";
-        Object.entries(CATALOG.food).forEach(([k,v])=>{
-          const opt = document.createElement("option");
-          opt.value = k; opt.textContent = `${v.emoji} ${v.label} (Cost ${v.cost})`;
-          giftSel.appendChild(opt);
-        });
-      },
-
-      renderRep(){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        if (!team) return UI.show("landingPage");
-        const member = Domain.ensureMember(team, session.email);
-        Domain.tickLlama(member);
-        // Daily streak update
-        Domain.updateStreak(member);
-        saveState(state);
-
-        // Header
-        document.getElementById("repFirstNameLabel").textContent = member.firstName || session.email;
-        document.getElementById("repTeamNameLabel").textContent = team.teamName;
-        document.getElementById("streakLabel").textContent = `Streak: ${member.streak.count}`;
-
-        // Mood background by happiness/hunger
-        const header = document.getElementById("repHeader");
-        header.classList.remove("mood-happy","mood-sad","mood-angry","mood-energized");
-        const h = member.llama.happiness, g = member.llama.hunger;
-        if (h > 70 && g > 50) header.classList.add("mood-happy");
-        else if (h < 35 && g < 30) header.classList.add("mood-angry");
-        else if (h < 45) header.classList.add("mood-sad");
-        else header.classList.add("mood-energized");
-
-        // Llama preview
-        document.getElementById("llama-base").src = CATALOG.llamaBase;
-        applyBackground(member);
-        applyLayer("hat", member);
-        applyLayer("neck", member);
-        applyLayer("pants", member);
-        applyLayer("shoes", member);
-        applyAccessories(member);
-
-        // Stats bars
-        document.getElementById("llamaNameLabel").textContent = member.llama.name || "Unnamed";
-        document.getElementById("llamaLevel").textContent = member.llama.level;
-        document.getElementById("llamaXP").textContent = member.llama.xp;
-        document.getElementById("hungerBar").style.width = `${Math.round(member.llama.hunger)}%`;
-        document.getElementById("happinessBar").style.width = `${Math.round(member.llama.happiness)}%`;
-
-        // PATH nodes (duo style)
-        const path = document.getElementById("pathNodes"); path.innerHTML = "";
-        (team.activities || []).slice(0,4).forEach((act,i)=>{
-          const day = todayKey();
-          const slot = member.progress[day]?.[i];
-          const complete = act.target ? (slot?.count || 0) >= act.target : !!slot?.done;
-          const node = document.createElement("div");
-          node.className = `px-3 py-2 rounded-xl border ${complete?'bg-emerald-500/20 border-emerald-400':'bg-white/5 border-white/10'}`;
-          node.innerHTML = `<div class="text-sm font-semibold">${UI.format(act.label,18)}</div>
-                            <div class="text-[10px] text-white/70">${act.target?`Target ${act.target}`:'Checkbox'}</div>`;
-          path.appendChild(node);
-        });
-
-        // Activities
-        const list = document.getElementById("activitiesList");
-        list.innerHTML = "";
-        const dayKey = todayKey();
-        if (!member.progress[dayKey]) member.progress[dayKey] = {};
-        (team.activities || []).slice(0,4).forEach((act, idx)=>{
-          const slot = member.progress[dayKey][idx] || (act.target ? { count: 0 } : { done: false });
-          member.progress[dayKey][idx] = slot;
-
-          const row = document.createElement("div");
-          row.className = "bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between";
-          if (act.target) {
-            row.innerHTML = `
-              <div>
-                <div class="font-semibold">${UI.format(act.label)}</div>
-                <div class="text-xs text-white/60">Target ${act.target} • Progress ${slot.count}</div>
-              </div>
-              <div class="flex items-center gap-2">
-                <button class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded" onclick="Handlers.adjustProgress(${idx},-1)">–</button>
-                <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded" onclick="Handlers.adjustProgress(${idx},1)">+1</button>
-              </div>
-            `;
-          } else {
-            row.innerHTML = `
-              <div>
-                <div class="font-semibold">${UI.format(act.label)}</div>
-                <div class="text-xs text-white/60">Checkbox</div>
-              </div>
-              <div>
-                <label class="inline-flex items-center gap-2">
-                  <input type="checkbox" ${slot.done ? "checked":""} onchange="Handlers.toggleDone(${idx}, this.checked)" />
-                  <span>Done</span>
-                </label>
-              </div>
-            `;
-          }
-          list.appendChild(row);
-        });
-        saveState(state);
-
-        // Coins label
-        document.getElementById("coinsLabel").textContent = `Coins: ${member.coins}`;
-
-        // Gifting dropdowns
-        const recSel = document.getElementById("repGiftRecipient");
-        recSel.innerHTML = "";
-        Object.values(team.members).forEach(m=>{
-          if (m.email === member.email) return;
-          const opt = document.createElement("option");
-          opt.value = m.email; opt.textContent = m.firstName || m.email;
-          recSel.appendChild(opt);
-        });
-        const itemSel = document.getElementById("repGiftItem");
-        itemSel.innerHTML = "";
-        Object.entries(member.inventory).forEach(([k,qty])=>{
-          if (qty>0){
-            const opt = document.createElement("option");
-            opt.value = k; opt.textContent = `${CATALOG.food[k].emoji} ${CATALOG.food[k].label} (You have ${qty})`;
-            itemSel.appendChild(opt);
-          }
-        });
-
-        // Inbox
-        const inbox = document.getElementById("giftInbox");
-        inbox.innerHTML = "";
-        (member.giftsInbox || []).slice(-10).reverse().forEach(g=>{
-          const row = document.createElement("div");
-          row.className = "bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between";
-          row.innerHTML = `<div class="text-sm"><span class="text-white/80">Gift from ${UI.format(g.fromName || g.from)}</span> · ${CATALOG.food[g.itemKey]?.emoji} ${CATALOG.food[g.itemKey]?.label}</div>
-            <button class="bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded text-sm" onclick="Handlers.claimGift('${g.id}')">Claim</button>`;
-          inbox.appendChild(row);
-        });
-
-        // Badges
-        Badges.render(member);
-      },
-
-      renderShop(tab="hats"){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        document.getElementById("shopCoins").textContent = member.coins;
-        document.getElementById("shopXP").textContent = member.llama.xp + (member.llama.level-1)*50;
-
-        const grid = document.getElementById("shopGrid"); grid.innerHTML = "";
-
-        const addCard = (item, type)=>{
-          const isFood = (type==="food");
-          const isBg = (type==="background");
-          const owned = isFood ? (member.inventory[item.key]||0)>0
-                               : isBg ? (member.equipped.background===item.key)
-                               : !!member.owned[item.key];
-          const equipped = !isFood && !isBg && (
-            member.equipped.hat===item.key ||
-            member.equipped.neck===item.key ||
-            member.equipped.pants===item.key ||
-            member.equipped.shoes===item.key ||
-            member.equipped.accessories.includes(item.key)
-          );
-
-          const div = document.createElement("div");
-          div.className = "bg-white/5 border border-white/10 rounded-xl p-3";
-          let media = "";
-          if (isFood) {
-            media = `<div class="text-4xl">${item.emoji}</div>`;
-          } else if (isBg) {
-            media = `<div class="w-full h-full" style="background:${item.thumbCSS};"></div>`;
-          } else {
-            media = `<img src="${item.thumb}" class="w-full h-full object-contain" alt="${item.name}" onerror="this.src='${item.image}'" />`;
-          }
-          div.innerHTML = `
-            <div class="aspect-video bg-white/5 rounded-xl mb-2 flex items-center justify-center overflow-hidden">
-              ${media}
-            </div>
-            <div class="font-semibold">${isFood ? item.label : item.name}</div>
-            <div class="text-xs text-white/60 mb-2">
-              ${isFood ? `Cost ${item.cost} · You have ${(member.inventory[item.key]||0)}`
-                       : isBg ? `Click to apply`
-                       : `Cost ${item.cost?.coins||0} · ${owned ? 'Owned' : 'Not owned'}`}
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              ${
-                isFood
-                ? `<button class="bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.buyFood('${item.key}')">Buy</button>
-                   <button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.feed('${item.key}')">Feed</button>`
-                : isBg
-                ? `<button class="col-span-2 bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.applyBackground('${item.key}')">Apply</button>`
-                : owned
-                  ? `<button class="bg-emerald-500 hover:bg-emerald-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.equip('${item.key}')">${equipped ? 'Unequip':'Equip'}</button>
-                     <button class="bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded text-sm" onclick="Handlers.preview('${item.key}')">Preview</button>`
-                  : `<button class="col-span-2 bg-indigo-500 hover:bg-indigo-600 px-2 py-1.5 rounded text-sm" onclick="Handlers.buy('${item.key}')">Buy</button>`
-              }
-            </div>
-          `;
-          grid.appendChild(div);
-        };
-
-        if (tab==="food"){
-          Object.entries(CATALOG.food).forEach(([key,v])=> addCard({ ...v, key }, "food"));
-        } else if (tab==="background"){
-          CATALOG.background.forEach(b => addCard(b, "background"));
-        } else {
-          (CATALOG[tab]||[]).forEach(i=> addCard(i, tab));
-        }
-      },
-
-      renderChat(){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const feed = document.getElementById("chatFeed");
-        feed.innerHTML = "";
-        team.chat.slice(-100).forEach(msg=>{
-          const row = document.createElement("div");
-          row.className = "flex items-start gap-2";
-          row.innerHTML = `
-            <div class="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-              <div class="text-xs text-white/60">${msg.name} • ${new Date(msg.at).toLocaleTimeString()}</div>
-              <div class="text-sm">${msg.text}</div>
-            </div>`;
-          feed.appendChild(row);
-        });
-        feed.scrollTop = feed.scrollHeight;
-      }
-    };
-
-    /****************
-     * Layer helpers
-     ****************/
-    function findItemByKey(key){
-      const groups = ["hats","neckwear","pants","shoes","accessories"];
-      for (const g of groups) { const f = (CATALOG[g]||[]).find(i=>i.key===key); if (f) return f; }
-      return null;
-    }
-    function applyLayer(slot, member){
-      const key = member.equipped[slot];
-      const imgEl = document.getElementById(`layer-${slot}`);
-      if (!key) { imgEl.src = ""; imgEl.style.transform = `translate(0,0) scale(1) rotate(0deg)`; return; }
-      const item = findItemByKey(key);
-      if (!item) return;
-      imgEl.src = item.image;
-      const o = item.offset || {x:0,y:0,scale:1,rotate:0};
-      imgEl.style.transform = `translate(${o.x}px, ${o.y}px) scale(${o.scale}) rotate(${o.rotate}deg)`;
-    }
-    function applyAccessories(member){
-      const wrap = document.getElementById("layer-accessories");
-      wrap.innerHTML = "";
-      (member.equipped.accessories||[]).forEach(key=>{
-        const item = findItemByKey(key); if (!item) return;
-        const img = document.createElement("img");
-        img.className = "llama-layer";
-        img.src = item.image;
-        const o = item.offset || {x:0,y:0,scale:1,rotate:0};
-        img.style.transform = `translate(${o.x}px, ${o.y}px) scale(${o.scale}) rotate(${o.rotate}deg)`;
-        wrap.appendChild(img);
-      });
-    }
-    function applyBackground(member){
-      const bgKey = member.equipped.background || "bg_meadow";
-      const bgItem = (CATALOG.background||[]).find(b=>b.key===bgKey);
-      const can = document.getElementById("llamaCanvas");
-      can.style.background = bgItem ? bgItem.bgCSS : "transparent";
-    }
-
-    /****************
-     * Event logic  *
-     ****************/
-    const Handlers = {
-      // Auth
-      createManagerAccount(e){
-        e.preventDefault();
-        const email = document.getElementById("managerEmail").value.trim().toLowerCase();
-        const teamName = document.getElementById("teamName").value.trim();
-        if (!email || !teamName) return;
-        const state = loadState();
-        const code = uid(10);
-        const team = Domain.ensureTeam(state, code);
-        team.teamName = teamName; team.managerEmail = email; team.activities = []; team.pending = []; team.members = team.members || {};
-        saveState(state);
-        session = { role: "manager", teamCode: code, email };
-        UI.toast(`Team created. Code ${code}`, "success");
-        UI.show("managerDashboard");
-      },
-      managerLogin(e){
-        e.preventDefault();
-        const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-        const code = document.getElementById("loginTeamCode").value.trim().toUpperCase();
-        const state = loadState();
-        const team = state.teams[code];
-        if (!team || team.managerEmail !== email) return UI.toast("Invalid email or team code", "error");
-        session = { role: "manager", teamCode: code, email };
-        UI.show("managerDashboard");
-      },
-      logout(){
-        session = { role:null, teamCode:null, email:null };
-        UI.toast("Signed out", "success");
-        UI.show("landingPage");
-      },
-
-      // Approvals
-      approve(idx){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const p = team.pending[idx]; if (!p) return;
-        const m = Domain.ensureMember(team, p.email);
-        m.firstName = p.firstName;
-        m.coins = Math.max(m.coins, 20);
-        team.pending.splice(idx,1);
-        saveState(state);
-        UI.toast("Rep approved", "success");
-        Screens.renderManager();
-      },
-      reject(idx){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        team.pending.splice(idx,1);
-        saveState(state);
-        UI.toast("Request removed", "warn");
-        Screens.renderManager();
-      },
-      refreshApprovals(){ Screens.renderManager(); },
-
-      saveActivities(e){
-        e.preventDefault();
-        const a = ["act1","act2","act3","act4"].map(id => Domain.parseActivity(document.getElementById(id).value.trim())).filter(Boolean);
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        team.activities = a.slice(0,4);
-        const dayKey = todayKey();
-        Object.values(team.members).forEach(m=>{
-          m.progress[dayKey] = {};
-          team.activities.forEach((act,i)=>{
-            m.progress[dayKey][i] = act.target ? { count: 0 } : { done: false };
-          });
-        });
-        saveState(state);
-        UI.toast("Activities saved and published", "success");
-        Screens.renderManager();
-      },
-
-      // Rep join/login
-      repJoinTeam(e){
-        e.preventDefault();
-        const firstName = document.getElementById("repFirstName").value.trim();
-        const email = document.getElementById("repEmail").value.trim().toLowerCase();
-        const code = document.getElementById("repTeamCode").value.trim().toUpperCase();
-        const state = loadState();
-        const team = state.teams[code];
-        if (!team) return UI.toast("Team code not found", "error");
-        if (team.members[email]) { session = { role: "rep", teamCode: code, email }; return UI.show("repDashboard"); }
-        if (team.pending.find(p=>p.email===email)) { session = { role: "rep", teamCode: code, email }; return UI.show("pendingApproval"); }
-        team.pending.push({ email, firstName, requestedAt: Date.now() });
-        saveState(state);
-        session = { role: "rep", teamCode: code, email };
-        UI.toast("Request sent to manager", "success");
-        UI.show("pendingApproval");
-      },
-      checkApprovalStatus(){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        if (!team) return UI.show("landingPage");
-        if (team.members[session.email]) UI.show("repDashboard"); else UI.toast("Still pending", "warn");
-      },
-      repLogin(e){
-        e.preventDefault();
-        const email = document.getElementById("repLoginEmail").value.trim().toLowerCase();
-        const code = document.getElementById("repLoginTeamCode").value.trim().toUpperCase();
-        const state = loadState();
-        const team = state.teams[code];
-        if (!team || !team.members[email]) {
-          if (team && team.pending.find(p=>p.email===email)) { session = { role: "rep", teamCode: code, email }; return UI.show("pendingApproval"); }
-          return UI.toast("Not approved yet or invalid", "error");
-        }
-        session = { role: "rep", teamCode: code, email };
-        UI.show("repDashboard");
-      },
-
-      // Llama + cosmetics
-      promptRename(){
-        const newName = prompt("Enter llama name"); if (!newName) return;
-        const lower = newName.toLowerCase();
-        if (profanityList.some(bad => lower.includes(bad))) return UI.toast("Please use a different name", "error");
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        member.llama.name = newName.trim();
-        saveState(state);
-        UI.toast("Name updated", "success");
-        Screens.renderRep();
-      },
-      preview(key){ this.equip(key); },
-      buy(key){
-        const item = findItemByKey(key); if (!item) return;
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        const cost = item.cost?.coins || 0;
-        if (member.coins < cost) return UI.toast("Not enough coins", "error");
-        member.coins -= cost;
-        member.owned[key] = true;
-        saveState(state);
-        UI.toast("Purchased", "success");
-        Screens.renderShop(); Screens.renderRep();
-        // Badge: accessorizer if 3+ equipped
-        const eqCount = ["hat","neck","pants","shoes"].filter(s=>member.equipped[s]).length + (member.equipped.accessories||[]).length;
-        if (eqCount >= 3) Badges.unlock(member, "accessor_3");
-      },
-      equip(key){
-        const item = findItemByKey(key); if (!item) return;
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        if (!member.owned[key]) return UI.toast("You don't own this yet", "warn");
-
-        if (item.slot === "accessory"){
-          const i = member.equipped.accessories.indexOf(key);
-          if (i>=0) member.equipped.accessories.splice(i,1); else member.equipped.accessories.push(key);
-        } else {
-          if (member.equipped[item.slot] === key) member.equipped[item.slot] = null;
-          else member.equipped[item.slot] = key;
-        }
-        saveState(state);
-        Screens.renderRep(); Screens.renderShop();
-        const eqCount = ["hat","neck","pants","shoes"].filter(s=>member.equipped[s]).length + (member.equipped.accessories||[]).length;
-        if (eqCount >= 3) Badges.unlock(member, "accessor_3");
-      },
-      applyBackground(key){
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        member.equipped.background = key;
-        saveState(state);
-        UI.toast("Background applied", "success");
-        Screens.renderRep(); Screens.renderShop();
-      },
-
-      // Food
-      buyFood(key){
-        const f = CATALOG.food[key]; if (!f) return;
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        if (member.coins < f.cost) return UI.toast("Not enough coins", "error");
-        member.coins -= f.cost;
-        member.inventory[key] = (member.inventory[key]||0)+1;
-        saveState(state);
-        UI.toast("Food purchased", "success");
-        Screens.renderShop(); Screens.renderRep();
-      },
-      feed(key){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        if (Domain.feed(member, key)) {
-          member.coins += 1;
-          saveState(state);
-          UI.toast(`Fed ${CATALOG.food[key].label}`, "success");
-          Screens.renderRep();
-        } else { UI.toast("No item available", "warn"); }
-      },
-
-      // Progress & path
-      adjustProgress(idx, delta){
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        const day = todayKey(); const act = team.activities[idx]; const slot = member.progress[day][idx]; if (!act?.target) return;
-        const before = slot.count||0;
-        slot.count = Math.max(0, Math.min(act.target, before + delta));
-        if (before < act.target && slot.count === act.target) {
-          member.coins += 5; member.llama.happiness = Math.min(100, member.llama.happiness + 5);
-          Domain.addXP(member, 4); UI.toast(`Completed: ${act.label}`, "success");
-          this.checkPathComplete(member, team);
-        }
-        saveState(state); Screens.renderRep();
-      },
-      toggleDone(idx, checked){
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        const day = todayKey(); const slot = member.progress[day][idx]; slot.done = !!checked;
-        if (slot.done) {
-          member.coins += 3; member.llama.happiness = Math.min(100, member.llama.happiness + 4);
-          Domain.addXP(member, 3);
-          this.checkPathComplete(member, team);
-        }
-        saveState(state); Screens.renderRep();
-      },
-      checkPathComplete(member, team){
-        const day = todayKey();
-        const allDone = (team.activities||[]).slice(0,4).every((a,i)=> a.target ? (member.progress[day][i].count>=a.target) : !!member.progress[day][i].done);
-        if (allDone) {
-          member.coins += 8; Domain.addXP(member, 6);
-          UI.toast("Path complete! +8 coins", "success");
-          Badges.unlock(member, "path_master");
-        }
-      },
-
-      // Mood (emoji modal)
-      submitMood(val){
-        const state = loadState();
-        const team = state.teams[session.teamCode];
-        const member = team.members[session.email];
-        const now = new Date();
-        member.checkins[todayKey()] = { mood: val, at: now.getTime() };
-        // Early bird badge
-        if (now.getHours() < 10) Badges.unlock(member, "early_bird");
-        member.llama.happiness = Math.min(100, member.llama.happiness + Math.max(0, val-2));
-        saveState(state);
-        UI.toast("Mood saved", "success");
-        UI.closeMoodModal();
-        Screens.renderRep();
-        Screens.renderManager();
-      },
-
-      // Chat (local demo)
-      sendChat(e){
-        e.preventDefault();
-        const input = document.getElementById("chatInput");
-        const text = input.value.trim(); if (!text) return;
-        const state = loadState(); const team = state.teams[session.teamCode];
-        const me = team.members[session.email] || { firstName: session.email };
-        team.chat.push({ from: session.email, name: me.firstName || session.email, text, at: Date.now() });
-        // Gift giver badge (use chat volume as social proxy)
-        if ((team.chat.filter(m=>m.from===session.email).length) === 5) {
-          const member = team.members[session.email];
-          Badges.unlock(member, "giver_5");
-        }
-        saveState(state);
-        input.value = "";
-        Screens.renderChat();
-      },
-
-      // Gifts (food only)
-      repGift(e){
-        e.preventDefault();
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        const recipientEmail = document.getElementById("repGiftRecipient").value;
-        const itemKey = document.getElementById("repGiftItem").value;
-        if ((member.inventory[itemKey] || 0) <= 0) return UI.toast("You do not have this item", "error");
-        member.inventory[itemKey] -= 1;
-        const rec = team.members[recipientEmail];
-        rec.giftsInbox.push({ id: uid(8), from: session.email, fromName: member.firstName, itemKey, at: Date.now() });
-        member.achievements.giftGiver = (member.achievements.giftGiver || 0) + 1;
-        saveState(state);
-        UI.toast("Gift sent", "success");
-        Screens.renderRep();
-      },
-      managerGift(e){
-        e.preventDefault();
-        const state = loadState(); const team = state.teams[session.teamCode];
-        const recipientEmail = document.getElementById("giftRecipient").value;
-        const itemKey = document.getElementById("giftItem").value;
-        const rec = team.members[recipientEmail];
-        rec.giftsInbox.push({ id: uid(8), from: session.email, fromName: team.managerEmail, itemKey, at: Date.now() });
-        saveState(state);
-        UI.toast("Gift sent", "success");
-        Screens.renderManager();
-      },
-      claimGift(id){
-        const state = loadState(); const team = state.teams[session.teamCode]; const member = team.members[session.email];
-        const idx = member.giftsInbox.findIndex(g=>g.id===id); if (idx<0) return;
-        const g = member.giftsInbox[idx];
-        member.inventory[g.itemKey] = (member.inventory[g.itemKey]||0) + 1;
-        member.giftsInbox.splice(idx,1);
-        saveState(state);
-        UI.toast("Gift claimed", "success");
-        Screens.renderRep();
-      }
-    };
-
-    /********************
-     * Seed + router    *
-     ********************/
-    UI.show("landingPage");
-
-    // Optional seed
-    (function seed(){
-      const s = loadState();
-      if (Object.keys(s.teams).length === 0) {
-        const code = uid(10);
-        s.teams[code] = {
-          teamName: "Demo Team",
-          managerEmail: "manager@example.com",
-          createdAt: Date.now(),
-          activities: [
-            { label: "Log calls", target: 3 },
-            { label: "Send follow ups", target: 5 },
-            { label: "Update pipeline", target: null },
-            { label: "Prep opportunities", target: null }
-          ],
-          pending: [],
-          members: {},
-          chat: []
-        };
-        const m1 = Domain.ensureMember(s.teams[code], "alex@example.com"); m1.firstName = "Alex"; m1.coins = 35;
-        const m2 = Domain.ensureMember(s.teams[code], "casey@example.com"); m2.firstName = "Casey"; m2.coins = 22;
-        saveState(s);
-      }
-    })();
-
-    // Heartbeat to decay hunger/happiness
-    setInterval(()=>{
-      if (!session.teamCode || !session.email) return;
-      const state = loadState(); const team = state.teams[session.teamCode]; if (!team) return;
-      const member = team.members[session.email]; if (!member) return;
-      Domain.tickLlama(member); saveState(state);
-      if (!document.getElementById("repDashboard").classList.contains("hidden")) {
-        document.getElementById("hungerBar").style.width = `${Math.round(member.llama.hunger)}%`;
-        document.getElementById("happinessBar").style.width = `${Math.round(member.llama.happiness)}%`;
-      }
-    }, 30000);
-  </script>
+  <!-- Load config + app -->
+  <!-- Keep this order: config first, then app -->
+  <script src="assets-config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
