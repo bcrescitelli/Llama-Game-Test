@@ -1,4 +1,4 @@
-<script>
+
 /* ==== IMAGES & CATALOG (uses your exact TN links; falls back to full image if TN missing/invalid) ==== */
 window.CATALOG = {
   llamaBase: "https://i.imgur.com/zgQ8490.png",
@@ -88,4 +88,4 @@ window.BUILDINGS = [
   { key:"observatory",       name:"Observatory",       cost:35, mins:25, unlocks:["perk:quest"] },
   { key:"pet_shelter",       name:"Pet Shelter",       cost:45, mins:25, unlocks:["perk:pet"] },
 ];
-</script>
+
