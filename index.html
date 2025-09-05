@@ -16,17 +16,18 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 .modal.show{display:flex}
 .modal-open{overflow:hidden}
 
-/* Llama centering & layering */
+/* Llama: perfect centering & synced layers */
 .llama-canvas{
-  position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;
-  overflow:hidden;display:grid;place-items:center;
+  position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden;background:transparent;
 }
 .llama-stack{
-  position:relative;width:100%;height:100%;
-  transform:scale(var(--llama-scale,1));transform-origin:center;
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(var(--llama-scale,1));
+  transform-origin:center center;
+  width:100%;height:100%;
 }
 .llama-layer{
-  position:absolute;left:0;top:0;width:100%;height:100%;
+  position:absolute;inset:0;width:100%;height:100%;
   object-fit:contain;object-position:center;pointer-events:none;
 }
 
@@ -181,6 +182,7 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     </div>
 
     <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Llama card -->
       <div class="glass rounded-2xl p-6">
         <h2 class="text-xl font-semibold mb-3">Your llama</h2>
         <div id="llamaCanvas" class="llama-canvas">
@@ -212,6 +214,7 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
         </div>
       </div>
 
+      <!-- Activities -->
       <div class="glass rounded-2xl p-6 lg:col-span-2">
         <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-1">Today’s path</h2><span class="text-sm text-white/60">Finish all 4 nodes to earn bonus!</span></div>
         <div id="pathNodes" class="flex flex-wrap gap-3 mt-2"></div>
@@ -219,8 +222,12 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
         <div class="mt-4 text-sm text-white/70" id="coinsLabel">Coins: 0</div>
       </div>
 
+      <!-- FULL-WIDTH Town panel (moved up, 100% width on desktop) -->
+      <div class="glass rounded-2xl p-6 lg:col-span-3" id="townPanelRep"></div>
+
+      <!-- Gifting (kept in-page so existing logic works) -->
       <div class="glass rounded-2xl p-6 lg:col-span-2">
-        <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Team social</h2></div>
+        <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Gifting</h2></div>
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <h3 class="font-semibold mb-2">Send a food gift</h3>
@@ -236,9 +243,6 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
           </div>
         </div>
       </div>
-
-      <!-- REP town (build here) -->
-      <div class="glass rounded-2xl p-6" id="townPanelRep"></div>
     </div>
   </div>
 </section>
@@ -326,7 +330,7 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 </div>
 
 <!-- Scripts -->
-<script src="assets-config.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="assets-config.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
