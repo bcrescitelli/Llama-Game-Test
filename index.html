@@ -16,20 +16,10 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 .modal.show{display:flex}
 .modal-open{overflow:hidden}
 
-/* Llama: perfect centering & synced layers */
-.llama-canvas{
-  position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden;background:transparent;
-}
-.llama-stack{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%) scale(var(--llama-scale,1));
-  transform-origin:center center;
-  width:100%;height:100%;
-}
-.llama-layer{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:contain;object-position:center;pointer-events:none;
-}
+/* Llama */
+.llama-canvas{position:relative;width:340px;height:340px;margin:0 auto;border-radius:1rem;overflow:hidden;background:transparent;}
+.llama-stack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(var(--llama-scale,1));transform-origin:center center;width:100%;height:100%;}
+.llama-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none;}
 
 .icon-btn{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem}
 .notif{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:9999px;font-size:10px;line-height:1;padding:2px 5px}
@@ -222,10 +212,10 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
         <div class="mt-4 text-sm text-white/70" id="coinsLabel">Coins: 0</div>
       </div>
 
-      <!-- FULL-WIDTH Town panel (moved up, 100% width on desktop) -->
+      <!-- FULL-WIDTH Town -->
       <div class="glass rounded-2xl p-6 lg:col-span-3" id="townPanelRep"></div>
 
-      <!-- Gifting (kept in-page so existing logic works) -->
+      <!-- Gifting -->
       <div class="glass rounded-2xl p-6 lg:col-span-2">
         <div class="flex items-center justify-between"><h2 class="text-xl font-semibold mb-3">Gifting</h2></div>
         <div class="grid md:grid-cols-2 gap-4">
@@ -330,7 +320,7 @@ body{font-family:Poppins,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 </div>
 
 <!-- Scripts -->
-<script src="assets-config.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="assets-config.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
