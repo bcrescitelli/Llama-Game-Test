@@ -1,5 +1,5 @@
 // assets-config.js
-
+// ---- Catalog (images + food + backgrounds + pets) ----
 window.CATALOG = {
   llamaBase: "https://i.imgur.com/zgQ8490.png",
 
@@ -11,7 +11,6 @@ window.CATALOG = {
       thumb:"https://i.imgur.com/1uG1sJh.png", image:"https://i.imgur.com/tWUl2Iz.png",
       cost:{coins:14}, slot:"hat" },
   ],
-
   neckwear: [
     { key:"cool_neck",  name:"Cool Necktie",
       thumb:"https://i.imgur.com/BfDS7mI.png", image:"https://i.imgur.com/X4wSwdR.png",
@@ -20,7 +19,6 @@ window.CATALOG = {
       thumb:"https://i.imgur.com/rRoOY9E.png", image:"https://i.imgur.com/wYOH3ah.png",
       cost:{coins:10}, slot:"neck" },
   ],
-
   pants: [
     { key:"cool_pants",  name:"Cool Pants",
       thumb:"https://i.imgur.com/lzPAKyL.png", image:"https://i.imgur.com/O2sMwsc.png",
@@ -29,7 +27,6 @@ window.CATALOG = {
       thumb:"https://i.imgur.com/A6gfUej.png", image:"https://i.imgur.com/1z0ZDVZ.png",
       cost:{coins:15}, slot:"pants" },
   ],
-
   shoes: [
     { key:"cool_shoes",  name:"Cool Shoes",
       thumb:"https://i.imgur.com/YrmbXe9.png", image:"https://i.imgur.com/90C8TNe.png",
@@ -38,7 +35,6 @@ window.CATALOG = {
       thumb:"https://i.imgur.com/K0GUBle.png", image:"https://i.imgur.com/xooykYg.png",
       cost:{coins:12}, slot:"shoes" },
   ],
-
   accessories: [
     { key:"sunglasses", name:"Sunglasses",
       thumb:"https://i.imgur.com/3PCFnWc.png", image:"https://i.imgur.com/UZ6jX96.png",
@@ -61,9 +57,15 @@ window.CATALOG = {
   ],
 
   background: [
-    { key:"bg_meadow", name:"Meadow",    thumbCSS:"linear-gradient(135deg,#86efac,#60a5fa)", bgCSS:"linear-gradient(135deg,#a7f3d0,#60a5fa)" },
-    { key:"bg_office", name:"Office",    thumbCSS:"linear-gradient(135deg,#cbd5e1,#94a3b8)", bgCSS:"linear-gradient(135deg,#e5e7eb,#94a3b8)" },
-    { key:"bg_night",  name:"Night Sky", thumbCSS:"linear-gradient(135deg,#0ea5e9,#111827)", bgCSS:"linear-gradient(135deg,#0ea5e9,#111827)" },
+    { key:"bg_meadow", name:"Meadow",
+      thumbCSS:"linear-gradient(135deg,#86efac,#60a5fa)",
+      bgCSS:"linear-gradient(135deg,#a7f3d0,#60a5fa)" },
+    { key:"bg_office", name:"Office",
+      thumbCSS:"linear-gradient(135deg,#cbd5e1,#94a3b8)",
+      bgCSS:"linear-gradient(135deg,#e5e7eb,#94a3b8)" },
+    { key:"bg_night",  name:"Night Sky",
+      thumbCSS:"linear-gradient(135deg,#0ea5e9,#111827)",
+      bgCSS:"linear-gradient(135deg,#0ea5e9,#111827)" },
   ],
 
   food: {
@@ -79,18 +81,18 @@ window.CATALOG = {
   ]
 };
 
+// ---- Buildings (with emoji) ----
 window.BUILDINGS = [
-  { key:"networking_center", name:"Networking Center", cost:40, mins:0.25, unlocks:["chat","gifting"], rareDrop:"sunglasses" },
-  { key:"market",            name:"Market",            cost:30, mins:0.25, unlocks:["food"],           rareDrop:"protein_shaker" },
-  { key:"outfitters",        name:"Outfitters",        cost:30, mins:0.25, unlocks:["shop:hats","shop:neckwear","shop:pants","shop:shoes"], rareDrop:"cool_hat" },
-  { key:"photo_booth",       name:"Photo Booth",       cost:25, mins:0.25, unlocks:["backgrounds"],    rareDrop:"mustache" },
-  { key:"pet_shelter",       name:"Pet Shelter",       cost:45, mins:0.25, unlocks:["pets"] },
-  { key:"gym",               name:"Gym",               cost:35, mins:0.25, unlocks:["buff:gym"] },
-  { key:"roastery",          name:"Coffee Roastery",   cost:25, mins:0.25, unlocks:["buff:espresso"] },
-  { key:"music_stage",       name:"Music Stage",       cost:40, mins:0.25, unlocks:["perk:petting"] },
-  { key:"workshop",          name:"Workshop",          cost:30, mins:0.25, unlocks:["perk:salvage"] },
-  { key:"bank",              name:"Bank",              cost:60, mins:0.25, unlocks:["perk:interest"] },
-  { key:"arcade",            name:"Arcade",            cost:50, mins:0.25, unlocks:["perk:celebration"] },
-  { key:"observatory",       name:"Observatory",       cost:35, mins:0.25, unlocks:["perk:quest"] }
+  { key:"networking_center", name:"Networking Center", emoji:"🗣️", cost:40, mins:0.25, unlocks:["chat","gifting"], rareDrop:"sunglasses" },
+  { key:"market",            name:"Market",            emoji:"🛒", cost:30, mins:0.25, unlocks:["food"],           rareDrop:"protein_shaker" },
+  { key:"outfitters",        name:"Outfitters",        emoji:"👗", cost:30, mins:0.25, unlocks:["shop:hats","shop:neckwear","shop:pants","shop:shoes"], rareDrop:"cool_hat" },
+  { key:"photo_booth",       name:"Photo Booth",       emoji:"📸", cost:25, mins:0.25, unlocks:["backgrounds"],    rareDrop:"mustache" },
+  { key:"pet_shelter",       name:"Pet Shelter",       emoji:"🐾", cost:45, mins:0.25, unlocks:["pets"] },
+  { key:"gym",               name:"Gym",               emoji:"🏋️", cost:35, mins:0.25, unlocks:["buff:gym"] },
+  { key:"roastery",          name:"Coffee Roastery",   emoji:"☕", cost:25, mins:0.25, unlocks:["buff:espresso"] },
+  { key:"music_stage",       name:"Music Stage",       emoji:"🎵", cost:40, mins:0.25, unlocks:["perk:petting"] },
+  { key:"workshop",          name:"Workshop",          emoji:"🛠️", cost:30, mins:0.25, unlocks:["perk:salvage"] },
+  { key:"bank",              name:"Bank",              emoji:"🏦", cost:60, mins:0.25, unlocks:["perk:interest"] },
+  { key:"arcade",            name:"Arcade",            emoji:"🕹️", cost:50, mins:0.25, unlocks:["perk:celebration"] },
+  { key:"observatory",       name:"Observatory",       emoji:"🔭", cost:35, mins:0.25, unlocks:["perk:quest"] }
 ];
-
